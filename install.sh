@@ -74,13 +74,13 @@ for cask in "${CASKS[@]}"; do
 done
 
 # ── Backup job (launchd) ──────────────────────────────────────────────────────
-PLIST_SRC="$HOME/dotfiles/scripts/com.dauphaihau.dotfiles-backup.plist"
+PLIST_SRC="$HOME/scripts/com.dauphaihau.dotfiles-backup.plist"
 PLIST_DST="$HOME/Library/LaunchAgents/com.dauphaihau.dotfiles-backup.plist"
-BACKUP_SCRIPT="$HOME/dotfiles/scripts/backup.sh"
+BACKUP_SCRIPT="$HOME/scripts/backup.sh"
 
 chmod +x "$BACKUP_SCRIPT"
-sed "s|DOTFILES_SCRIPTS_PATH|$BACKUP_SCRIPT|g" "$PLIST_SRC" > "$PLIST_DST"
-launchctl load "$PLIST_DST"
+/usr/bin/sed "s|DOTFILES_SCRIPTS_PATH|$BACKUP_SCRIPT|g" "$PLIST_SRC" > "$PLIST_DST"
+launchctl bootstrap gui/$(id -u) "$PLIST_DST"
 echo "Backup job registered — runs every hour."
 
 echo "Done. Add this to your shell profile:"
