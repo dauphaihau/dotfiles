@@ -1,6 +1,32 @@
 #!/usr/bin/env bash
 set -e
 
+REPO_URL="https://github.com/dauphaihau/dotfiles.git"
+BARE_DIR="$HOME/dotfiles"
+
+# ── Dotfiles ──────────────────────────────────────────────────────────────────
+if [ -d "$BARE_DIR" ]; then
+  echo "Bare repo already exists at $BARE_DIR — skipping clone."
+else
+  git clone --bare "$REPO_URL" "$BARE_DIR"
+fi
+
+dot() {
+  git --git-dir="$BARE_DIR" --work-tree="$HOME" "$@"
+}
+
+dot config --local status.showUntrackedFiles no
+
+if ! dot checkout 2>/dev/null; then
+  echo "Backing up pre-existing dotfiles to ~/.dotfiles-backup/"
+  mkdir -p "$HOME/.dotfiles-backup"
+  dot checkout 2>&1 \
+    | grep "^\s" \
+    | awk '{print $1}' \
+    | xargs -I{} sh -c 'mkdir -p "$HOME/.dotfiles-backup/$(dirname "{}")" && mv "$HOME/{}" "$HOME/.dotfiles-backup/{}"'
+  dot checkout
+fi
+
 # ── Homebrew ──────────────────────────────────────────────────────────────────
 if ! command -v brew &>/dev/null; then
   echo "Installing Homebrew..."
@@ -47,4 +73,5 @@ for cask in "${CASKS[@]}"; do
   fi
 done
 
-echo "Done."
+echo "Done. Add this to your shell profile:"
+echo "  alias dot='git --git-dir=\"\$HOME/dotfiles\" --work-tree=\"\$HOME\"'"
