@@ -1,5 +1,4 @@
 alias reload='source ~/.zshrc'
-alias dot='git --git-dir="$HOME/dotfiles" --work-tree="$HOME"'
 
 alias c='claude'
 alias cs='cursor'

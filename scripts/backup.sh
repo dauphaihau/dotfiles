@@ -1,14 +1,12 @@
 #!/usr/bin/env bash
 set -e
 
-dot() {
-  git --git-dir="$HOME/dotfiles" --work-tree="$HOME" "$@"
-}
+DOTFILES_DIR="$HOME/dotfiles"
 
-if ! dot status --porcelain | grep -q .; then
+if ! git -C "$DOTFILES_DIR" status --porcelain | grep -q .; then
   exit 0
 fi
 
-dot add -u
-dot commit -m "auto backup: $(date '+%Y-%m-%d %H:%M:%S')"
-dot push
+git -C "$DOTFILES_DIR" add -u
+git -C "$DOTFILES_DIR" commit -m "auto backup: $(date '+%Y-%m-%d %H:%M:%S')"
+git -C "$DOTFILES_DIR" push

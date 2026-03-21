@@ -2,29 +2,13 @@
 set -e
 
 REPO_URL="https://github.com/dauphaihau/dotfiles.git"
-BARE_DIR="$HOME/dotfiles"
+DOTFILES_DIR="$HOME/dotfiles"
 
 # ── Dotfiles ──────────────────────────────────────────────────────────────────
-if [ -d "$BARE_DIR" ]; then
-  echo "Bare repo already exists at $BARE_DIR — skipping clone."
+if [ -d "$DOTFILES_DIR" ]; then
+  echo "Dotfiles already exist at $DOTFILES_DIR — skipping clone."
 else
-  git clone --bare "$REPO_URL" "$BARE_DIR"
-fi
-
-dot() {
-  git --git-dir="$BARE_DIR" --work-tree="$HOME" "$@"
-}
-
-dot config --local status.showUntrackedFiles no
-
-if ! dot checkout 2>/dev/null; then
-  echo "Backing up pre-existing dotfiles to ~/.dotfiles-backup/"
-  mkdir -p "$HOME/.dotfiles-backup"
-  dot checkout 2>&1 \
-    | grep "^\s" \
-    | awk '{print $1}' \
-    | xargs -I{} sh -c 'mkdir -p "$HOME/.dotfiles-backup/$(dirname "{}")" && mv "$HOME/{}" "$HOME/.dotfiles-backup/{}"'
-  dot checkout
+  git clone "$REPO_URL" "$DOTFILES_DIR"
 fi
 
 # ── Homebrew ──────────────────────────────────────────────────────────────────
@@ -37,6 +21,7 @@ fi
 
 # ── Formulae ──────────────────────────────────────────────────────────────────
 FORMULAE=(
+  stow
   zsh-autosuggestions
   zsh-syntax-highlighting
   bat
@@ -73,15 +58,22 @@ for cask in "${CASKS[@]}"; do
   fi
 done
 
+# ── Stow dotfiles ─────────────────────────────────────────────────────────────
+echo "Stowing dotfiles..."
+PACKAGES=(zsh bash vim aliases)
+for pkg in "${PACKAGES[@]}"; do
+  stow --target="$HOME" --dir="$DOTFILES_DIR" "$pkg"
+  echo "  stowed $pkg"
+done
+
 # ── Backup job (launchd) ──────────────────────────────────────────────────────
-PLIST_SRC="$HOME/scripts/com.dauphaihau.dotfiles-backup.plist"
+PLIST_SRC="$DOTFILES_DIR/scripts/com.dauphaihau.dotfiles-backup.plist"
 PLIST_DST="$HOME/Library/LaunchAgents/com.dauphaihau.dotfiles-backup.plist"
-BACKUP_SCRIPT="$HOME/scripts/backup.sh"
+BACKUP_SCRIPT="$DOTFILES_DIR/scripts/backup.sh"
 
 chmod +x "$BACKUP_SCRIPT"
 /usr/bin/sed "s|DOTFILES_SCRIPTS_PATH|$BACKUP_SCRIPT|g" "$PLIST_SRC" > "$PLIST_DST"
 launchctl bootstrap gui/$(id -u) "$PLIST_DST"
 echo "Backup job registered — runs every hour."
 
-echo "Done. Add this to your shell profile:"
-echo "  alias dot='git --git-dir=\"\$HOME/dotfiles\" --work-tree=\"\$HOME\"'"
+echo "Done."
