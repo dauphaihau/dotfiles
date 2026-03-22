@@ -124,4 +124,3 @@ eval "$(starship init zsh)"
 [ -s "/Users/dauphaihau/.bun/_bun" ] && source "/Users/dauphaihau/.bun/_bun"
 
 if command -v wt >/dev/null 2>&1; then eval "$(command wt config shell init zsh)"; fi
-
