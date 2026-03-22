@@ -20,9 +20,3 @@ export PATH="/Volumes/Local/dev/sdk/flutter/bin:$PATH"               # Flutter
 export PATH="$PATH:$HOME/.rvm/bin"                                   # RVM
 export PATH="$PATH:$HOME/.lmstudio/bin"                              # LM Studio
 export PATH="$PATH:/Applications/Docker.app/Contents/Resources/bin/" # Docker
-
-# Herd PHP 8.4
-export HERD_PHP_84_INI_SCAN_DIR="/Users/dauphaihau/Library/Application Support/Herd/config/php/84/"
-
-# Databases
-export DATABASE_URL="postgresql://meepodb_owner:SwOhTZcbf50t@ep-icy-frost-a1v2856h.ap-southeast-1.aws.neon.tech/meepodb?sslmode=require"
