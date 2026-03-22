@@ -51,6 +51,32 @@ done
 CASKS=(
   raycast
   karabiner-elements
+  alcove
+  bartender
+  betterzip
+  chatgpt
+  claude
+  cleanmymac
+  cleanshot
+  clop
+  cloudflare-warp
+  contexts
+  cursor
+  devutils
+  safari-technology-preview
+  sigmaos
+  tableplus
+  warp
+  zed
+  numi
+  jetbrains-toolbox
+  imazing
+  hiddenbar
+  hammerspoon
+  google-chrome@dev
+  firefox@developer-edition
+  espanso
+  discord
 )
 
 echo "Installing casks..."
