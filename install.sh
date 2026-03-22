@@ -21,21 +21,31 @@ fi
 
 # ── Formulae ──────────────────────────────────────────────────────────────────
 FORMULAE=(
+  # Dotfiles
   stow
+
+  # Shell
   zsh-autosuggestions
   zsh-syntax-highlighting
-  bat
-  fd
-  zoxide
-  lua
-  ripgrep
-  neovim
+
+  # CLI replacements
+  bat        # cat
+  fd         # find
+  zoxide     # cd
+  ripgrep    # grep
+  tree       # ls (tree view)
+
+  # Dev tools
   git
   gh
-  tree
-  tree-sitter
   node
   nvm
+  lua
+  tree-sitter
+
+  # TUI
+  fzf
+  neovim
 )
 
 echo "Installing formulae..."
@@ -49,33 +59,49 @@ done
 
 # ── Casks ─────────────────────────────────────────────────────────────────────
 CASKS=(
-  raycast
-  karabiner-elements
-  alcove
-  bartender
-  betterzip
-  chatgpt
-  claude
-  cleanmymac
-  cleanshot
-  clop
-  cloudflare-warp
-  contexts
+  # Editors & terminals
   cursor
-  devutils
-  safari-technology-preview
-  sigmaos
-  tableplus
-  warp
   zed
-  numi
+  warp
+  neovim
   jetbrains-toolbox
-  imazing
-  hiddenbar
-  hammerspoon
+
+  # Browsers
   google-chrome@dev
   firefox@developer-edition
+  safari-technology-preview
+  sigmaos
+
+  # AI
+  chatgpt
+  claude
+
+  # Productivity
+  raycast
   espanso
+  numi
+  contexts
+  hammerspoon
+
+  # macOS enhancements
+  bartender
+  hiddenbar
+  alcove
+  clop
+  cleanmymac
+
+  # Dev tools
+  tableplus
+  devutils
+  cloudflare-warp
+
+  # Utilities
+  betterzip
+  cleanshot
+  imazing
+  karabiner-elements
+
+  # Communication
   discord
 )
 
