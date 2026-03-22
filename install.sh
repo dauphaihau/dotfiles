@@ -133,6 +133,11 @@ CASKS=(
 
   # Communication
   discord
+
+  # Fonts
+  font-hack-nerd-font
+  font-jetbrains-mono-nerd-font
+  font-sf-pro
 )
 
 echo "Installing casks..."
