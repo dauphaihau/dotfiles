@@ -32,6 +32,10 @@ FORMULAE=(
   neovim
   git
   gh
+  tree
+  tree-sitter
+  node
+  nvm
 )
 
 echo "Installing formulae..."
