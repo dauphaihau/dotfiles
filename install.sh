@@ -156,6 +156,9 @@ fi
 
 MAS_APPS=(
   1596283165  # rcmd
+  6446206067  # Klack
+   497799835  # Xcode
+   775737590  # iA Writer
 )
 
 echo "Installing Mac App Store apps..."
