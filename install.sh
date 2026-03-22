@@ -144,6 +144,16 @@ for cask in "${CASKS[@]}"; do
   fi
 done
 
+# ── Go packages ───────────────────────────────────────────────────────────────
+GO_PACKAGES=(
+  github.com/neur0map/glazepkg@latest
+)
+
+echo "Installing Go packages..."
+for pkg in "${GO_PACKAGES[@]}"; do
+  go install "$pkg"
+done
+
 # ── Stow dotfiles ─────────────────────────────────────────────────────────────
 echo "Stowing dotfiles..."
 PACKAGES=(zsh vim karabiner zed nvim claude warp)
