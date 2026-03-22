@@ -149,6 +149,24 @@ for cask in "${CASKS[@]}"; do
   fi
 done
 
+# ── Mac App Store ─────────────────────────────────────────────────────────────
+if ! command -v mas &>/dev/null; then
+  brew install mas
+fi
+
+MAS_APPS=(
+  1596283165  # rcmd
+)
+
+echo "Installing Mac App Store apps..."
+for app_id in "${MAS_APPS[@]}"; do
+  if mas list | grep -q "^$app_id"; then
+    echo "  $app_id already installed — skipping."
+  else
+    mas install "$app_id"
+  fi
+done
+
 # ── Go packages ───────────────────────────────────────────────────────────────
 GO_PACKAGES=(
   github.com/neur0map/glazepkg@latest
