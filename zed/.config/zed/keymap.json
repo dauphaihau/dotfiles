@@ -1,0 +1,220 @@
+[
+  {
+    "context": "Editor && VimControl && !VimWaiting && !menu",
+    "bindings": {
+      "tab": "pane::ActivatePreviousItem",
+      "shift-tab": "pane::ActivateNextItem",
+      "q": "pane::CloseActiveItem",
+      "shift-q": "pane::ReopenClosedItem",
+      ",f": "editor::Format",
+      "cmd-shift-f": "editor::OpenFile",
+    },
+  },
+  {
+    "context": "Workspace",
+    "bindings": {
+      "cmd-9": "git_panel::ToggleFocus",
+    },
+  },
+  {
+    "bindings": {
+      "cmd-l": "workspace::ToggleLeftDock",
+    },
+  },
+  {
+    "context": "AgentPanel",
+    "bindings": {
+      "cmd-1": "project_panel::ToggleFocus",
+    },
+  },
+  {
+    "context": "!ContextEditor > (Editor && mode == full)",
+    "bindings": {
+      "cmd-1": "pane::RevealInProjectPanel",
+    },
+  },
+  {
+    "context": "Workspace",
+    "bindings": {
+      "cmd-1": "project_panel::ToggleFocus",
+    },
+  },
+  {
+    "context": "ProjectSearchBar",
+    "bindings": {
+      "cmd-shift-f": "search::FocusSearch",
+    },
+  },
+  {
+    "bindings": {
+      "cmd-shift-f": "pane::DeploySearch",
+    },
+  },
+  {
+    "context": "KeymapEditor",
+    "bindings": {
+      "cmd-e": "zed::OpenKeymapFile",
+    },
+  },
+  {
+    "bindings": {
+      "cmd-e": "file_finder::Toggle",
+    },
+  },
+  {
+    "context": "Workspace",
+    "bindings": {
+      "cmd-shift-e": "file_finder::Toggle",
+    },
+  },
+  {
+    "context": "((VimControl && !menu) || (!Editor && !Terminal))",
+    "bindings": {
+      ", w": "pane::CloseAllItems",
+    },
+  },
+  {
+    "context": "((VimControl && !menu) || (!Editor && !Terminal))",
+    "bindings": {
+      "alt-a": "vim::ResizePaneLeft",
+    },
+  },
+  {
+    "context": "((VimControl && !menu) || (!Editor && !Terminal))",
+    "bindings": {
+      "alt-d": "vim::ResizePaneRight",
+    },
+  },
+  {
+    "context": "ProjectPanel",
+    "bindings": {
+      "shift-backspace": "project_panel::Delete",
+      "alt-n": "project_panel::NewDirectory",
+    },
+  },
+  {
+    "context": "Editor",
+    "bindings": {
+      ", f": "editor::Format",
+    },
+  },
+  {
+    "context": "AgentPanel",
+    "bindings": {
+      "cmd-shift-i": "agent::ToggleNewThreadMenu",
+    },
+  },
+  {
+    "context": "(Editor && mode == full)",
+    "bindings": {
+      "cmd-shift-l": "agent::AddSelectionToThread",
+    },
+  },
+  {
+    "context": "(AgentPanel && acp_thread)",
+    "bindings": {
+      "cmd-shift-i": "agent::NewThread",
+    },
+  },
+  {
+    "context": "AcpThread > Editor",
+    "bindings": {
+      "cmd-i": null
+    }
+  },
+  {
+    "context": "AgentPanel",
+    "bindings": {
+      "cmd-i": null
+    }
+  },
+  {
+    "context": "AcpThread > Editor",
+    "bindings": {
+      "cmd-i": null
+    }
+  },
+  {
+    "context": "AcpThread > Editor",
+    "bindings": {
+      "cmd-.": "agent::ToggleProfileSelector"
+    }
+  },
+  {
+    "context": "AgentPanel",
+    "bindings": {
+      "cmd-shift-m": "agent::ToggleModelSelector"
+    }
+  },
+  {
+    "context": "AcpThread > Editor",
+    "bindings": {
+      "cmd-shift-c": "agent::OpenAddContextMenu"
+    }
+  },
+  {
+    "context": "ContextEditor > Editor",
+    "bindings": {
+      "cmd-s": null
+    }
+  },
+  {
+    "context": "Workspace",
+    "bindings": {
+      "cmd-s": null
+    }
+  },
+  {
+    "context": "Editor",
+    "bindings": {
+      "cmd-s": [
+        "editor::SelectNext",
+        {
+          "replace_newest": false
+        }
+      ]
+    }
+  },
+  {
+    "context": "(VimControl && !menu)",
+    "bindings": {
+      ", d": "editor::GoToDefinition"
+    }
+  },
+  {
+    "context": "((vim_mode == helix_normal || vim_mode == helix_select) && !menu)",
+    "bindings": {
+      ", r": "editor::FindAllReferences"
+    }
+  },
+  {
+    "context": "(VimControl && !menu)",
+    "bindings": {
+      ", r": "editor::FindAllReferences"
+    }
+  },
+  {
+    "context": "(VimControl && !menu)",
+    "bindings": {
+      "space z c": "editor::FoldAll"
+    }
+  },
+  {
+    "context": "Editor",
+    "bindings": {
+      "space z o": "editor::UnfoldAll"
+    }
+  },
+  {
+    "context": "(ProjectPanel && not_editing)",
+    "bindings": {
+      "n": "project_panel::NewFile"
+    }
+  },
+  {
+    "context": "(ProjectPanel && not_editing)",
+    "bindings": {
+      "r": "project_panel::Rename"
+    }
+  }
+]

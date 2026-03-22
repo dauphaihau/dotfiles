@@ -60,7 +60,7 @@ done
 
 # ── Stow dotfiles ─────────────────────────────────────────────────────────────
 echo "Stowing dotfiles..."
-PACKAGES=(zsh bash vim aliases karabiner)
+PACKAGES=(zsh bash vim aliases karabiner zed)
 for pkg in "${PACKAGES[@]}"; do
   stow --target="$HOME" --dir="$DOTFILES_DIR" "$pkg"
   echo "  stowed $pkg"
