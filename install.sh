@@ -33,7 +33,20 @@ FORMULAE=(
   fd         # find
   zoxide     # cd
   ripgrep    # grep
+  eza        # ls
   tree       # ls (tree view)
+  sd         # sed
+  xh         # curl
+  tlrc       # man
+  duf        # df
+  doggo      # dig
+  procs      # ps
+  gping      # ping
+  trash      # rm
+  coreutils
+  yq         # yaml/json processor
+  jd         # json diff
+  btop       # top
 
   # Dev tools
   git
@@ -42,6 +55,23 @@ FORMULAE=(
   nvm
   lua
   tree-sitter
+  starship
+  go
+  python
+  php
+  mkcert
+
+  # Formatters & linters
+  stylua
+  swiftformat
+
+  # Infrastructure
+  colima
+  mc             # minio client
+
+  # Xcode
+  xcode-build-server
+  worktrunk
 
   # TUI
   fzf
