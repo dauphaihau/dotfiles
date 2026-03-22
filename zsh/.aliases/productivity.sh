@@ -1,10 +1,10 @@
 alias ports='lsof -i -P -n | grep LISTEN'
 alias myip='curl -s ifconfig.me'
 
-alias nd='mkdir -p'
-alias nf='touch'
-alias sl='ln -s'
-alias cpwd='pwd | pbcopy'
+alias nd='mkdir -p' # new directory
+alias nf='touch' # new file
+alias sl='ln -s' # symlink
+alias cpwd='pwd | pbcopy'  # copy current dir path
 
 alias cp='cp -ri'
 alias mv='mv -i'

@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -e
 
-DOTFILES_DIR="$HOME/dotfiles"
+DOTFILES_DIR="/Volumes/Local/dev/pj-personal/dotfiles"
 
 if ! git -C "$DOTFILES_DIR" status --porcelain | grep -q .; then
   exit 0

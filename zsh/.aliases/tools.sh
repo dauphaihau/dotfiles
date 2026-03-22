@@ -3,6 +3,7 @@ alias reload='source ~/.zshrc'
 alias c='claude'
 alias cs='cursor'
 alias z='zed'
+alias j='just'
 
 alias claude-mem='bun "/Users/dauphaihau/.claude/plugins/marketplaces/thedotmack/plugin/scripts/worker-service.cjs"'
 

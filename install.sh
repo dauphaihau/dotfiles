@@ -60,6 +60,8 @@ FORMULAE=(
   python
   php
   mkcert
+  just
+  hurl
 
   # Formatters & linters
   stylua
