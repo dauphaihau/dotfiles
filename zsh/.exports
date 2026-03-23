@@ -27,3 +27,9 @@ export PATH="$PATH:$HOME/.rvm/bin"                                   # RVM
 export PATH="$PATH:$HOME/.lmstudio/bin"                              # LM Studio
 export PATH="$PATH:/Applications/Docker.app/Contents/Resources/bin/" # Docker
 export PATH="$PATH:$HOME/go/bin"                                     # Go
+
+# file colors (theme)
+export LS_COLORS="$(vivid generate catppuccin-mocha)"
+
+# permission colors (dim)
+export EZA_COLORS="ur=2:uw=2:ux=2:gr=2:gw=2:gx=2:tr=2:tw=2:tx=2"

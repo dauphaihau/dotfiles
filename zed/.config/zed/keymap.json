@@ -119,50 +119,50 @@
   {
     "context": "AcpThread > Editor",
     "bindings": {
-      "cmd-i": null
-    }
+      "cmd-i": null,
+    },
   },
   {
     "context": "AgentPanel",
     "bindings": {
-      "cmd-i": null
-    }
+      "cmd-i": null,
+    },
   },
   {
     "context": "AcpThread > Editor",
     "bindings": {
-      "cmd-i": null
-    }
+      "cmd-i": null,
+    },
   },
   {
     "context": "AcpThread > Editor",
     "bindings": {
-      "cmd-.": "agent::ToggleProfileSelector"
-    }
+      "cmd-.": "agent::ToggleProfileSelector",
+    },
   },
   {
     "context": "AgentPanel",
     "bindings": {
-      "cmd-shift-m": "agent::ToggleModelSelector"
-    }
+      "cmd-shift-m": "agent::ToggleModelSelector",
+    },
   },
   {
     "context": "AcpThread > Editor",
     "bindings": {
-      "cmd-shift-c": "agent::OpenAddContextMenu"
-    }
+      "cmd-shift-c": "agent::OpenAddContextMenu",
+    },
   },
   {
     "context": "ContextEditor > Editor",
     "bindings": {
-      "cmd-s": null
-    }
+      "cmd-s": null,
+    },
   },
   {
     "context": "Workspace",
     "bindings": {
-      "cmd-s": null
-    }
+      "cmd-s": null,
+    },
   },
   {
     "context": "Editor",
@@ -170,51 +170,57 @@
       "cmd-s": [
         "editor::SelectNext",
         {
-          "replace_newest": false
-        }
-      ]
-    }
+          "replace_newest": false,
+        },
+      ],
+    },
   },
   {
     "context": "(VimControl && !menu)",
     "bindings": {
-      ", d": "editor::GoToDefinition"
-    }
+      ", d": "editor::GoToDefinition",
+    },
   },
   {
     "context": "((vim_mode == helix_normal || vim_mode == helix_select) && !menu)",
     "bindings": {
-      ", r": "editor::FindAllReferences"
-    }
+      ", r": "editor::FindAllReferences",
+    },
   },
   {
     "context": "(VimControl && !menu)",
     "bindings": {
-      ", r": "editor::FindAllReferences"
-    }
+      ", r": "editor::FindAllReferences",
+    },
   },
   {
     "context": "(VimControl && !menu)",
     "bindings": {
-      "space z c": "editor::FoldAll"
-    }
+      "space z c": "editor::FoldAll",
+    },
   },
   {
     "context": "Editor",
     "bindings": {
-      "space z o": "editor::UnfoldAll"
-    }
+      "space z o": "editor::UnfoldAll",
+    },
   },
   {
     "context": "(ProjectPanel && not_editing)",
     "bindings": {
-      "n": "project_panel::NewFile"
-    }
+      "n": "project_panel::NewFile",
+    },
   },
   {
     "context": "(ProjectPanel && not_editing)",
     "bindings": {
-      "r": "project_panel::Rename"
+      "r": "project_panel::Rename",
+    },
+  },
+  {
+    "context": "((vim_mode == normal || vim_mode == helix_normal) && !menu)",
+    "bindings": {
+      "enter": "vim::InsertEmptyLineBelow"
     }
   }
 ]

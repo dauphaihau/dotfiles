@@ -1,4 +1,4 @@
-alias reload='source ~/.zshrc'
+alias rl='source ~/.zshrc'
 
 alias c='claude'
 alias cs='cursor'
