@@ -75,6 +75,9 @@ FORMULAE=(
   xcode-build-server
   worktrunk
 
+  # File watching
+  fswatch
+
   # TUI
   fzf
   neovim
