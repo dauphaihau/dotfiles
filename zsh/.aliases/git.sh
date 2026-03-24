@@ -13,12 +13,12 @@ alias gp='git pull'
 gundo() { git reset --soft HEAD~${1:-1}; }
 gwip() { git add -A && git commit -m "WIP"; }
 ghprc() { [[ -z "$1" ]] && echo "Usage: ghprc <target-branch>" && return 1; gh pr create --base "$1"; }
-gbl() {
-  local path="."
-  for arg in "$@"; do
-    [[ "$arg" == --rp=* ]] && path="${arg#--rp=}"
-  done
-  git -C "$path" branch -a
-}
+# gbl() {
+#   local path="."
+#   for arg in "$@"; do
+#     [[ "$arg" == --rp=* ]] && path="${arg#--rp=}"
+#   done
+#   git -C "$path" branch -a
+# }
 gclean() { git fetch -p && git branch -vv | grep ': gone]' | awk '{print $1}' | xargs git branch -d; }
 gfetch() { [[ -z "$1" ]] && echo "Usage: gfetch <branch>" && return 1; git fetch origin "$1"; }
