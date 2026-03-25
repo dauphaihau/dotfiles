@@ -19,14 +19,9 @@ export BUN_INSTALL="$HOME/.bun"
 export PNPM_HOME="/Users/dauphaihau/Library/pnpm"
 
 # PATH entries (order: high priority → low priority)
-export PATH="/Users/dauphaihau/.codeium/windsurf/bin:$PATH"         # Windsurf
-export PATH="/Users/dauphaihau/.antigravity/antigravity/bin:$PATH"  # Antigravity
-export PATH="/Users/dauphaihau/Library/Application Support/Herd/bin/:$PATH" # Herd PHP
 export PATH="$BUN_INSTALL/bin:$PATH"                                 # Bun
 export PATH="$PNPM_HOME:$PATH"                                       # PNPM
-export PATH="/Volumes/Local/dev/sdk/flutter/bin:$PATH"               # Flutter
 export PATH="$PATH:$HOME/.rvm/bin"                                   # RVM
-export PATH="$PATH:$HOME/.lmstudio/bin"                              # LM Studio
 export PATH="$PATH:/Applications/Docker.app/Contents/Resources/bin/" # Docker
 export PATH="$PATH:$HOME/go/bin"                                     # Go
 
