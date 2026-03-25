@@ -26,7 +26,11 @@ fi
 
 # bat → replace cat
 if command -v bat &>/dev/null; then
-  alias cat='bat --paging=never'
+  if [[ "$(defaults read -g AppleInterfaceStyle 2>/dev/null)" == "Dark" ]]; then
+    alias cat='bat --paging=never --theme="Dracula"'
+  else
+    alias cat='bat --paging=never --theme="Catppuccin Latte"'
+  fi
 fi
 
 # ripgrep → replace grep

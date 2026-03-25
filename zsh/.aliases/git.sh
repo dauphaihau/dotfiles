@@ -10,6 +10,9 @@ alias gcb='git checkout -b'
 alias gpub='git push -u origin HEAD'
 alias gsync='git pull --rebase --prune'
 alias gp='git pull'
+alias gb='git branch'
+alias gba='git branch -a -vv'
+alias gbr='git branch --sort=-committerdate --format="%(HEAD) %(color:yellow)%(refname:short)%(color:reset) - %(color:red)%(objectname:short)%(color:reset) %(contents:subject) %(color:blue)(%(committerdate:relative)) %(color:green)%(authorname)%(color:reset)"'
 
 gundo() { git reset --soft HEAD~${1:-1}; }
 gwip() { git add -A && git commit -m "WIP"; }
