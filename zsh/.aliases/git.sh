@@ -5,6 +5,10 @@ alias gd='git diff --word-diff'
 alias gds='git diff --cached --word-diff'
 gdb() { [[ -z "$1" ]] && echo "Usage: gdb <branch>" && return 1; git diff "$1"..HEAD --word-diff; }
 glb() { [[ -z "$1" ]] && echo "Usage: glb <branch>" && return 1; echo "Showing log for branch: $1"; git log --oneline --graph --decorate "$1"; }
+glg() { [[ -z "$1" ]] && echo "Usage: glg <message> [branch]" && return 1; git log --oneline --graph --decorate ${2:---all} --grep="$1"; }
+gsl() { git log --oneline ${1:---all} | fzf | awk '{print $1}'; } # git search log
+gshow() { git show ${1:-HEAD} | bat --style=plain; }
+alias gdp='git diff | bat --style=plain'
 
 # Staging / Commit
 alias ga='git add -A'
@@ -18,6 +22,7 @@ alias gco='git checkout'
 alias gcb='git checkout -b'
 alias gcl='git clone'
 alias ghcl='gh repo clone'
+gcof() { git checkout $(git branch --all | fzf | tr -d '[:space:]'); }
 
 # Push / Pull
 alias gsync='git pull --rebase --prune'
@@ -31,13 +36,30 @@ alias gbr='git branch --sort=-committerdate --format="%(HEAD) %(color:yellow)%(r
 gmb() { [[ -z "$1" ]] && echo "Usage: gmb <branch>" && return 1; git merge "$1" --no-ff; }
 grb() { [[ -z "$1" ]] && echo "Usage: grb <branch>" && return 1; git rebase "$1"; }
 gclean() { git fetch -p && git branch -vv | grep ': gone]' | awk '{print $1}' | xargs git branch -d; }
+gsf() { git stash apply $(git stash list | fzf | awk -F: '{print $1}'); }
 
 # Cherry-pick
 alias gcp='git cherry-pick'
 alias gcpa='git cherry-pick --abort'
 alias gcpc='git cherry-pick --continue'
-# navigate to repo, checkout base branch, create new branch
-gwb() { [[ -z "$3" ]] && echo "Usage: gwb <repo-path> <base-branch> <new-branch>" && return 1; cd "$1" && git checkout "$2" && git checkout -b "$3"; }
+gwb() { # navigate to repo, checkout base branch, create new branch
+  if [[ $# -eq 2 ]]; then
+    git checkout "$1" && git checkout -b "$2"
+  elif [[ $# -eq 3 ]]; then
+    cd "$1" && git checkout "$2" && git checkout -b "$3"
+  else
+    echo "Usage: gwb <base-branch> <new-branch> | gwb <repo-path> <base-branch> <new-branch>"
+    return 1
+  fi
+}
+# search + pick multiple commits
+gpickm() { git cherry-pick $(git log --oneline ${1:---all} | fzf -m | awk '{print $1}'); }
+
 
 # GitHub
 ghprc() { [[ -z "$1" ]] && echo "Usage: ghprc <target-branch>" && return 1; gh pr create --base "$1"; }
+alias ghprl='gh pr list'
+
+# Search
+gfind() { [[ -z "$1" ]] && echo "Usage: gfind <string> [branch]" && return 1; git log --oneline -S "$1" ${2:---all} | rg --color=always "$1"; }
+grg() { [[ -z "$1" ]] && echo "Usage: grg <pattern>" && return 1; git ls-files | xargs rg "$1"; }
