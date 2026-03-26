@@ -28,7 +28,7 @@ fi
 # bat → replace cat
 if command -v bat &>/dev/null; then
   if [[ "$(defaults read -g AppleInterfaceStyle 2>/dev/null)" == "Dark" ]]; then
-    alias cat='bat --paging=never --theme="Dracula"'
+    alias cat='bat --paging=never --theme="ansi"'
   else
     alias cat='bat --paging=never --theme="Catppuccin Latte"'
   fi
