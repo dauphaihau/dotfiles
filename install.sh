@@ -40,6 +40,7 @@ FORMULAE=(
   tlrc       # man
   duf        # df
   doggo      # dig
+  vivid      # LS_COLORS generator
   procs      # ps
   gping      # ping
   trash      # rm
@@ -81,6 +82,14 @@ FORMULAE=(
   # TUI
   fzf
   neovim
+
+  # Networking
+  websocat
+
+  # Media
+  ffmpeg
+  eyed3
+  yt-dlp
 )
 
 echo "Installing formulae..."
