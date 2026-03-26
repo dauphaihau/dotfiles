@@ -34,6 +34,7 @@ alias gb='git branch'
 alias gba='git branch -a -vv'
 alias gbr='git branch --sort=-committerdate --format="%(HEAD) %(color:yellow)%(refname:short)%(color:reset) - %(color:red)%(objectname:short)%(color:reset) %(contents:subject) %(color:blue)(%(committerdate:relative)) %(color:green)%(authorname)%(color:reset)"'
 gmb() { [[ -z "$1" ]] && echo "Usage: gmb <branch>" && return 1; git merge "$1" --no-ff; }
+gbrn() { if [[ $# -eq 1 ]]; then git branch -m "$1"; elif [[ $# -eq 2 ]]; then git branch -m "$1" "$2"; else echo "Usage: gbrn <new-name> | gbrn <old-name> <new-name>"; return 1; fi; } # gbrn <new-name>: rename current branch | gbrn <old-name> <new-name>: rename any branch
 grb() { [[ -z "$1" ]] && echo "Usage: grb <branch>" && return 1; git rebase "$1"; }
 gclean() { git fetch -p && git branch -vv | grep ': gone]' | awk '{print $1}' | xargs git branch -d; }
 gsf() { git stash apply $(git stash list | fzf | awk -F: '{print $1}'); }
@@ -63,3 +64,4 @@ alias ghprl='gh pr list'
 # Search
 gfind() { [[ -z "$1" ]] && echo "Usage: gfind <string> [branch]" && return 1; git log --oneline -S "$1" ${2:---all} | rg --color=always "$1"; }
 grg() { [[ -z "$1" ]] && echo "Usage: grg <pattern>" && return 1; git ls-files | xargs rg "$1"; }
+gbf() { git branch -a | rg --color=always "${1:-.}"; } # git branch find
