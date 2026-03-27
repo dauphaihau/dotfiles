@@ -32,6 +32,8 @@ gpu() { if [[ -z "$1" ]]; then git push -u origin HEAD; else echo "Pushing branc
 # Branch
 alias gb='git branch'
 alias gba='git branch -a -vv'
+alias gbd='git branch -d' # safe delete, fails if unmerged
+alias gbD='git branch -D' # force delete
 alias gbr='git branch --sort=-committerdate --format="%(HEAD) %(color:yellow)%(refname:short)%(color:reset) - %(color:red)%(objectname:short)%(color:reset) %(contents:subject) %(color:blue)(%(committerdate:relative)) %(color:green)%(authorname)%(color:reset)"'
 gmb() { [[ -z "$1" ]] && echo "Usage: gmb <branch>" && return 1; git merge "$1" --no-ff; }
 gbrn() { if [[ $# -eq 1 ]]; then git branch -m "$1"; elif [[ $# -eq 2 ]]; then git branch -m "$1" "$2"; else echo "Usage: gbrn <new-name> | gbrn <old-name> <new-name>"; return 1; fi; } # gbrn <new-name>: rename current branch | gbrn <old-name> <new-name>: rename any branch
