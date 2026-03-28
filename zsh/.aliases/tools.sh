@@ -32,7 +32,6 @@ fi
 if command -v eza &>/dev/null; then
   alias ll='eza -lh --icons --git'
   alias la='eza -lah --icons --git'
-  alias lt='eza --tree --icons'
 
   # Sorting
   alias lls='eza -lh --icons --git --sort=size'
@@ -44,8 +43,11 @@ if command -v eza &>/dev/null; then
   alias ld='eza -lh --icons --git --only-dirs'
 
   # Tree with depth control
+  alias lt='eza --tree --icons -L 1'
   alias lt2='eza --tree --icons -L 2'
   alias lt3='eza --tree --icons -L 3'
+  alias lt2i='eza --tree --icons -L 2 --git-ignore'
+  alias lt3i='eza --tree --icons -L 3 --git-ignore'
   alias ltg='eza --tree --icons --git-ignore'
 
 else

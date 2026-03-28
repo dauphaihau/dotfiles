@@ -35,7 +35,6 @@ FORMULAE=(
   zoxide     # cd
   ripgrep    # grep
   eza        # ls
-  tree       # ls (tree view)
   sd         # sed
   xh         # curl
   tlrc       # man
