@@ -29,3 +29,9 @@ eval "$(starship init zsh)"
 [ -s "/Users/dauphaihau/.bun/_bun" ] && source "/Users/dauphaihau/.bun/_bun"
 
 if command -v wt >/dev/null 2>&1; then eval "$(command wt config shell init zsh)"; fi
+
+# Launch nushell as a child process (exit nu to return to zsh)
+# Skipped in Warp — use Warp's startup command setting instead
+if command -v nu >/dev/null 2>&1 && [ -z "$NU_VERSION" ] && [ "$TERM_PROGRAM" != "WarpTerminal" ]; then
+  nu
+fi

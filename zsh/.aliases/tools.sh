@@ -1,6 +1,7 @@
 alias rl='source ~/.zshrc'
 alias reapply-icons='sudo bash /Volumes/Local/dev/pj-personal/dotfiles/scripts/reapply-icons.sh'
 
+alias n='nu -c'
 alias c='claude'
 alias cs='cursor'
 alias z='zed'
