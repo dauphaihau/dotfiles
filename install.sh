@@ -27,6 +27,7 @@ FORMULAE=(
   # Shell
   zsh-autosuggestions
   zsh-syntax-highlighting
+  nushell
 
   # CLI replacements
   bat        # cat
