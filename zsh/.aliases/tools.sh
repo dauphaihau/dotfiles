@@ -1,19 +1,5 @@
 alias rl='source ~/.zshrc'
 
-# yt-dlp: download video as mp4 (best h264 quality) + embed caption as Finder comment
-ytdl() {
-    
-  yt-dlp -f "bestvideo[vcodec^=avc]+bestaudio/best" --merge-output-format mp4 \
-    --embed-metadata --add-metadata --write-description \
-    --print after_move:filepath "$1" | while read -r filepath; do
-      desc_file="${filepath:r}.description"
-      if [[ -f "$desc_file" ]]; then
-        osascript -e "tell application \"Finder\" to set comment of (POSIX file \"$filepath\" as alias) to \"$(cat "$desc_file")\""
-      fi
-    done
-}
-ytdlp() { yt-dlp "$1" }
-
 
 alias reapply-icons='sudo bash /Volumes/Local/dev/pj-personal/dotfiles/scripts/reapply-icons.sh'
 
