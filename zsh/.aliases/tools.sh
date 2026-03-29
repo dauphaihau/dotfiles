@@ -10,6 +10,14 @@ alias j='just'
 
 alias claude-mem='bun "/Users/dauphaihau/.claude/plugins/marketplaces/thedotmack/plugin/scripts/worker-service.cjs"'
 
+# ccusage — Claude API cost tracking (https://ccusage.com)
+alias ccu='bunx ccusage'
+alias ccud='bunx ccusage daily'
+alias ccum='bunx ccusage monthly'
+alias ccus='bunx ccusage session'
+alias ccub='bunx ccusage blocks'
+alias ccusi='bunx ccusage session --id'  # usage: ccusi <session-id>
+
 # zoxide → replace cd
 if command -v zoxide &>/dev/null; then
   eval "$(zoxide init zsh --cmd g)"
