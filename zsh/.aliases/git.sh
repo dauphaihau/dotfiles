@@ -30,8 +30,8 @@ gp() { if [[ -z "$1" ]]; then git pull; else echo "Pulling branch: $1"; git fetc
 gpu() { if [[ -z "$1" ]]; then git push -u origin HEAD; else echo "Pushing branch: $1"; git push origin "$1"; fi; }
 
 # Branch
-alias gb='git branch'
-alias gba='git branch -a -vv'
+alias gb='git branch' # list local branches
+alias gba='git branch -a -vv' # list also remote branches
 alias gbd='git branch -d' # safe delete, fails if unmerged
 alias gbD='git branch -D' # force delete
 alias gbr='git branch --sort=-committerdate --format="%(HEAD) %(color:yellow)%(refname:short)%(color:reset) - %(color:red)%(objectname:short)%(color:reset) %(contents:subject) %(color:blue)(%(committerdate:relative)) %(color:green)%(authorname)%(color:reset)"'
@@ -67,3 +67,4 @@ alias ghprl='gh pr list'
 gfind() { [[ -z "$1" ]] && echo "Usage: gfind <string> [branch]" && return 1; git log --oneline -S "$1" ${2:---all} | rg --color=always "$1"; }
 grg() { [[ -z "$1" ]] && echo "Usage: grg <pattern>" && return 1; git ls-files | xargs rg "$1"; }
 gbf() { git branch -a | rg --color=always "${1:-.}"; } # git branch find
+gbsf() { git branch -a | fzf; } # git branch search with fzf
