@@ -1,14 +1,16 @@
-# Status / Log
+# Status
 alias gs='git status -sb'
-# alias gl='git log --oneline --graph --decorate --all'
 alias gd='git diff --word-diff'
 alias gds='git diff --cached --word-diff'
 gdb() { [[ -z "$1" ]] && echo "Usage: gdb <branch>" && return 1; git diff "$1"..HEAD --word-diff; }
-glb() { [[ -z "$1" ]] && echo "Usage: glb <branch>" && return 1; echo "Showing log for branch: $1"; git log --oneline --graph --decorate "$1"; }
-glg() { [[ -z "$1" ]] && echo "Usage: glg <message> [branch]" && return 1; git log --oneline --graph --decorate ${2:---all} --grep="$1"; }
-gsl() { git log --oneline ${1:---all} | fzf | awk '{print $1}'; } # git search log
+# glb() { [[ -z "$1" ]] && echo "Usage: glb <branch>" && return 1; echo "Showing log for branch: $1"; git log --oneline --graph --decorate "$1"; }
+# glg() { [[ -z "$1" ]] && echo "Usage: glg <message> [branch]" && return 1; git log --oneline --graph --decorate ${2:---all} --grep="$1"; }
 # gshow() { git show ${1:-HEAD} | bat --style=plain; }
 alias gdp='git diff | bat --style=plain'
+
+ # Log ( prefix gl )
+alias gl='git log --oneline --decorate'
+gls() { git log --oneline ${1:---all} | fzf | awk '{print $1}'; } # git search log
 
 # Staging / Commit
 alias ga='git add -A'
