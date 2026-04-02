@@ -106,8 +106,7 @@
                 "from": {
                   "key_code": "o",
                   "modifiers": {
-                    "mandatory": ["option"],
-                    "optional": ["any"]
+                    "mandatory": ["option"]
                   }
                 },
                 "to": [{ "pointing_button": "button2" }],
