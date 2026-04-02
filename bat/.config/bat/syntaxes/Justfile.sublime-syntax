@@ -1,0 +1,101 @@
+%YAML 1.2
+---
+name: Justfile
+file_extensions:
+  - just
+  - justfile
+hidden_file_extensions:
+  - .justfile
+first_line_match: '^#\s*just\s*$'
+scope: source.justfile
+
+contexts:
+  main:
+    # Comments
+    - match: '#.*$'
+      scope: comment.line.number-sign.justfile
+
+    # String literals
+    - match: '"'
+      scope: punctuation.definition.string.begin.justfile
+      push: double_string
+    - match: "'"
+      scope: punctuation.definition.string.begin.justfile
+      push: single_string
+    - match: "`"
+      scope: punctuation.definition.string.begin.justfile
+      push: backtick_string
+
+    # Settings
+    - match: '^(set)\s+(\w+)'
+      captures:
+        1: keyword.control.justfile
+        2: variable.other.justfile
+
+    # Import / mod
+    - match: '^(import|mod)\b'
+      scope: keyword.control.justfile
+
+    # Variable assignment (top-level)
+    - match: '^([a-zA-Z_][a-zA-Z0-9_-]*)\s*(:?:?=)'
+      captures:
+        1: variable.other.justfile
+        2: keyword.operator.assignment.justfile
+
+    # Recipe definition: name followed by optional params and colon
+    - match: '^(@?)([a-zA-Z_][a-zA-Z0-9_-]*)(\s*\()?'
+      captures:
+        1: keyword.operator.justfile
+        2: entity.name.function.justfile
+        3: punctuation.definition.parameters.justfile
+
+    # Recipe dependencies marker
+    - match: ':'
+      scope: punctuation.separator.justfile
+
+    # Built-in functions
+    - match: \b(arch|os|os_family|env_var|env_var_or_default|invocation_directory|justfile|justfile_directory|just_executable|source_file|source_directory|config_directory|data_directory|data_local_directory|executable_directory|home_directory|cache_directory|num_cpus|replace|replace_regex|trim|trim_start|trim_end|trim_start_match|trim_end_match|split|join|path_exists|absolute_path|file_name|file_stem|file_extension|parent_directory|without_extension|append|prepend|error|assert|quote|lowercase|uppercase|capitalize|sha256|sha256_file|encode_uri_component|decode_uri_component|semver_matches|choose|uuid|datetime|datetime_utc|blake3|blake3_file|read|shell)\b
+      scope: support.function.builtin.justfile
+
+    # Interpolation {{ }}
+    - match: '\{\{'
+      scope: punctuation.definition.interpolation.begin.justfile
+      push: interpolation
+
+    # Operators
+    - match: '&&|\|\|'
+      scope: keyword.operator.logical.justfile
+
+    # Recipe body indented lines (shell)
+    - match: '^    .+'
+      scope: source.shell.embedded.justfile
+
+  double_string:
+    - meta_scope: string.quoted.double.justfile
+    - match: '\\.'
+      scope: constant.character.escape.justfile
+    - match: '"'
+      scope: punctuation.definition.string.end.justfile
+      pop: true
+
+  single_string:
+    - meta_scope: string.quoted.single.justfile
+    - match: "'"
+      scope: punctuation.definition.string.end.justfile
+      pop: true
+
+  backtick_string:
+    - meta_scope: string.interpolated.justfile
+    - match: '`'
+      scope: punctuation.definition.string.end.justfile
+      pop: true
+
+  interpolation:
+    - meta_scope: meta.interpolation.justfile
+    - match: '\}\}'
+      scope: punctuation.definition.interpolation.end.justfile
+      pop: true
+    - match: '[a-zA-Z_][a-zA-Z0-9_-]*'
+      scope: variable.other.justfile
+    - match: '\b(if|else)\b'
+      scope: keyword.control.justfile

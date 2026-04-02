@@ -8,7 +8,7 @@
   <key>ProgramArguments</key>
   <array>
     <string>/bin/bash</string>
-    <string>DOTFILES_SCRIPTS_PATH</string>
+    <string>/Volumes/Local/dev/pj-personal/dotfiles/scripts/backup.sh</string>
   </array>
 
   <key>StartInterval</key>

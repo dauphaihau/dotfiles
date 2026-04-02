@@ -1,0 +1,47 @@
+#!/usr/bin/env bash
+
+# Dynamic LS_COLORS: light=catppuccin-mocha, dark=dracula
+# Uses fswatch to detect macOS appearance changes in real time
+
+_ls_colors_apply() {
+  local cache="/tmp/ls_colors_cache"
+  [[ "$cache" -nt "/tmp/ls_colors_applied" ]] || return
+  export LS_COLORS="$(cat $cache)"
+  touch /tmp/ls_colors_applied
+}
+
+_ls_colors_init() {
+  local cache="/tmp/ls_colors_cache"
+  local pidfile="/tmp/ls_colors_watcher.pid"
+  local plist="$HOME/Library/Preferences/.GlobalPreferences.plist"
+
+  # Start fswatch watcher if not already running
+  if ! { [[ -f "$pidfile" ]] && kill -0 "$(cat $pidfile)" 2>/dev/null; }; then
+    (
+      fswatch -o "$plist" | while IFS= read -r _; do
+        if [[ "$(defaults read -g AppleInterfaceStyle 2>/dev/null)" == "Dark" ]]; then
+          vivid generate dracula
+        else
+          vivid generate catppuccin-mocha
+        fi > "$cache"
+      done
+    ) &!
+    echo $! > "$pidfile"
+  fi
+
+  # Build initial cache if missing
+  if [[ ! -f "$cache" ]]; then
+    if [[ "$(defaults read -g AppleInterfaceStyle 2>/dev/null)" == "Dark" ]]; then
+      vivid generate dracula > "$cache"
+    else
+      vivid generate catppuccin-mocha > "$cache"
+    fi
+  fi
+
+  export LS_COLORS="$(cat $cache)"
+  touch /tmp/ls_colors_applied
+}
+
+autoload -U add-zsh-hook
+add-zsh-hook precmd _ls_colors_apply
+_ls_colors_init
