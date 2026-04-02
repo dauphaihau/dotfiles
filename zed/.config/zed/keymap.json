@@ -207,4 +207,22 @@
       "shift-enter": "search::SelectPreviousMatch",
     },
   },
+  {
+    "context": "Workspace",
+    "unbind": {
+      "cmd-shift-b": "outline_panel::ToggleFocus"
+    }
+  },
+  {
+    "context": "Workspace",
+    "bindings": {
+      "cmd-shift-b": "git::Branch"
+    }
+  },
+  {
+    "context": "Workspace",
+    "unbind": {
+      "ctrl-cmd-b": "git::Branch"
+    }
+  }
 ]
