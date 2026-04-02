@@ -94,27 +94,6 @@
             ]
           },
           {
-            "description": "Option+O => Right Click (Only in Zed)",
-            "manipulators": [
-              {
-                "conditions": [
-                  {
-                    "bundle_identifiers": ["^dev\\.zed\\.Zed$"],
-                    "type": "frontmost_application_if"
-                  }
-                ],
-                "from": {
-                  "key_code": "o",
-                  "modifiers": {
-                    "mandatory": ["option"]
-                  }
-                },
-                "to": [{ "pointing_button": "button2" }],
-                "type": "basic"
-              }
-            ]
-          },
-          {
             "description": "Delete => Cmd+backspace (Delete) (Only in Finder)",
             "manipulators": [
               {
