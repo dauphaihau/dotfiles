@@ -31,10 +31,10 @@ alias gsync='git pull --rebase --prune'
 gp() { if [[ -z "$1" ]]; then git pull; else echo "Pulling branch: $1"; git fetch origin "$1:$1"; fi; }
 gpu() { if [[ -z "$1" ]]; then git push -u origin HEAD; else echo "Pushing branch: $1"; git push origin "$1"; fi; }
 
-# Branch ( prefix gb )
+# Branch
 alias gb='git branch' # list local branches
 alias gba='git branch -a -vv' # list also remote branches
-gbd() { [[ -z "$1" ]] && echo "Usage: gbd <branch>" && return 1; git branch -d "$1" && git push origin --delete "$1" && echo "Deleted local and remote branch: $1"; } # safe delete, fails if unmerged
+alias gbd='git branch -d' # safe delete, fails if unmerged
 alias gbD='git branch -D' # force delete
 alias gbr='git branch --sort=-committerdate --format="%(HEAD) %(color:yellow)%(refname:short)%(color:reset) - %(color:red)%(objectname:short)%(color:reset) %(contents:subject) %(color:blue)(%(committerdate:relative)) %(color:green)%(authorname)%(color:reset)"'
 gmb() { [[ -z "$1" ]] && echo "Usage: gmb <branch>" && return 1; git merge "$1" --no-ff; }
