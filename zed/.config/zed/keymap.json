@@ -224,5 +224,21 @@
     "unbind": {
       "ctrl-cmd-b": "git::Branch"
     }
+  },
+  {
+    "context": "KeymapEditor",
+    "unbind": {
+      "cmd-shift-c": "keymap_editor::CopyContext"
+    }
+  },
+  {
+    "bindings": {
+      "cmd-shift-c": "editor::CopyPath"
+    }
+  },
+  {
+    "bindings": {
+      "cmd-shift-c": "editor::CopyRelativePath"
+    }
   }
 ]
