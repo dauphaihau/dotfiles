@@ -35,3 +35,18 @@ if command -v wt >/dev/null 2>&1; then eval "$(command wt config shell init zsh)
 if command -v nu >/dev/null 2>&1 && [ -z "$NU_VERSION" ] && [ "$TERM_PROGRAM" != "WarpTerminal" ]; then
   nu
 fi
+
+export PATH="$HOME/go/bin:$PATH"
+
+# atlas-cli
+export ATLAS_BACKEND_PATH="/Volumes/Local/dev/pj-personal/apps/atlas/apps/api"
+export POSTGRES_PASSWORD="secret"
+export POSTGRES_HOST="localhost"
+export POSTGRES_DB="atlas"
+export POSTGRES_USER="laravel"
+
+export ATLAS_PHP_CONTAINER="atlas-php"
+
+# zsh completions
+fpath=(~/.zsh/completions $fpath)
+autoload -U compinit && compinit
