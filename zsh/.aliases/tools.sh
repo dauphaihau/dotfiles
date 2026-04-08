@@ -2,7 +2,8 @@ alias rl='unalias -a && for f in ~/.aliases/*.sh; do [ -f "$f" ] && source "$f";
 
 alias reapply-icons='sudo bash /Volumes/Local/dev/pj-personal/dotfiles/scripts/reapply-icons.sh'
 
-alias c='claude'
+alias c='codex'
+alias cl='claude'
 alias cs='cursor'
 alias z='zed'
 alias j='just'
