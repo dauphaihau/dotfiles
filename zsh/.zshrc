@@ -50,3 +50,33 @@ export ATLAS_PHP_CONTAINER="atlas-php"
 # zsh completions
 fpath=(~/.zsh/completions $fpath)
 autoload -U compinit && compinit
+
+devcopy() {
+  local tmp_file url
+  local -a cmd
+
+  tmp_file="$(mktemp)"
+
+  if [ -f pnpm-lock.yaml ] && command -v pnpm >/dev/null 2>&1; then
+    cmd=(pnpm dev)
+  elif [ -f yarn.lock ] && command -v yarn >/dev/null 2>&1; then
+    cmd=(yarn dev)
+  else
+    cmd=(npm run dev)
+  fi
+
+  "${cmd[@]}" 2>&1 | tee "$tmp_file" &
+  local dev_pid=$!
+
+  while kill -0 "$dev_pid" >/dev/null 2>&1; do
+    url="$(perl -ne 'print "$1\n" if m{(http://localhost:\d+/)}' "$tmp_file" | tail -n 1)"
+    if [ -n "$url" ]; then
+      printf '%s' "$url" | pbcopy
+      echo "Copied: $url"
+      break
+    fi
+    sleep 0.2
+  done
+
+  wait "$dev_pid"
+}
