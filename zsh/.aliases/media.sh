@@ -27,25 +27,51 @@ dlv() {
     --no-download \
     "$url" 2>/dev/null)
 
+  local tmpfile
+  tmpfile=$(mktemp)
+
   local -a args=(
-    -f "bestvideo[vcodec^=avc]+bestaudio/best"  # best h264 video + best audio
-    --merge-output-format mp4                   # mux into mp4 container
-    --embed-metadata                            # embed title/uploader/etc into file
-    --add-metadata                              # write metadata tags (date, description…)
-    --no-write-description                      # skip writing a separate .description file
-    -o "%(title).100B [%(id)s].%(ext)s"         # truncate title to 100 bytes to avoid long filename errors
-    --print after_move:filepath                 # print final filepath after download+merge
+    -f "bestvideo[vcodec^=avc]+bestaudio/best"          # best h264 video + best audio
+    --merge-output-format mp4                            # mux into mp4 container
+    --embed-metadata                                     # embed title/uploader/etc into file
+    --add-metadata                                       # write metadata tags (date, description…)
+    --no-write-description                               # skip writing a separate .description file
+    -o "%(title).100B [%(id)s].%(ext)s"                  # truncate title to 100 bytes to avoid long filename errors
+    --print-to-file "after_move:filepath" "$tmpfile"     # write final filepath to temp file
   )
 
-  [[ -n "$range" ]] && args+=(--download-sections "$range")
+  [[ -n "$range" ]] && args+=(--download-sections "$range" --force-keyframes-at-cuts)
   args+=("${extra_args[@]}")
 
-  yt-dlp "${args[@]}" "$url" | while read -r filepath; do
-      if [[ -n "$desc" ]]; then
-        local safe_desc="${desc//\"/\\\"}"
-        osascript -e "tell application \"Finder\" to set comment of (POSIX file \"$filepath\" as alias) to \"$safe_desc\""
-      fi
-    done
+  yt-dlp "${args[@]}" "$url"
+
+  local filepath
+  filepath=$(cat "$tmpfile" 2>/dev/null | tail -1)
+  rm -f "$tmpfile"
+
+  # Fix black frames / wrong container duration caused by DASH segment boundaries
+  if [[ -n "$range" && -n "$filepath" ]]; then
+    local range_stripped="${range#\*}"
+    local ts_start="${range_stripped%%-*}"
+    local ts_end="${range_stripped##*-}"
+
+    local start_s=0 end_s=0 x
+    local -a parts
+    parts=(${(s/:/)ts_start})
+    for x in $parts; do start_s=$(( start_s * 60 + x )); done
+    parts=(${(s/:/)ts_end})
+    for x in $parts; do end_s=$(( end_s * 60 + x )); done
+
+    local clip_duration=$(( end_s - start_s ))
+    local tmpvid="${filepath%.mp4}_fix.mp4"
+    ffmpeg -y -loglevel error -i "$filepath" -t "$clip_duration" -c copy "$tmpvid" \
+      && mv "$tmpvid" "$filepath"
+  fi
+
+  if [[ -n "$desc" && -n "$filepath" ]]; then
+    local safe_desc="${desc//\"/\\\"}"
+    osascript -e "tell application \"Finder\" to set comment of (POSIX file \"$filepath\" as alias) to \"$safe_desc\""
+  fi
 }
 
 # set mp3 metadata tags: mtag -f <file> [-t title] [-a artist] [-i image] [-l lyrics]
