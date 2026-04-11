@@ -1,10 +1,15 @@
-alias ports='lsof -i -P -n | grep LISTEN'
-alias myip='curl -s ifconfig.me'
-
 alias nd='mkdir -p' # new directory
+ndc() { mkdir -p "$@" && cd "${@: -1}"; } # new directory and cd into it
 alias nf='touch' # new file
 alias sl='ln -s' # symlink
 alias cpwd='pwd | pbcopy'  # copy current dir path
+
+# trash → replace rm (moves to macOS Trash, recoverable)
+if [[ -x "/opt/homebrew/opt/trash/bin/trash" ]]; then
+  export PATH="/opt/homebrew/opt/trash/bin:$PATH"
+  alias rm='trash'
+  alias d='trash'
+fi
 
 alias cp='cp -ri'
 alias mv='mv -i'

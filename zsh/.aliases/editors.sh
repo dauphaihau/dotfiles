@@ -1,1 +1,5 @@
 alias v='nvim'
+alias c='codex'
+alias cc='claude'
+alias cs='cursor'
+alias z='zed'
