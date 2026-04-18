@@ -240,5 +240,11 @@
     "bindings": {
       "cmd-shift-c": "editor::CopyRelativePath"
     }
+  },
+  {
+    "context": "VimControl && !menu",
+    "unbind": {
+      "ctrl-w ctrl-]": "editor::GoToDefinitionSplit"
+    }
   }
 ]
