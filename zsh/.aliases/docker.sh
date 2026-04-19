@@ -12,3 +12,4 @@ alias dcu='docker compose up'   # start services
 alias dcud='docker compose up -d' # start services in background
 alias dcd='docker compose down' # stop and remove services
 alias dcl='docker compose logs -f' # follow logs
+alias dex='docker exec -it'        # exec into container
