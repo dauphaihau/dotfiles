@@ -246,5 +246,23 @@
     "unbind": {
       "ctrl-w ctrl-]": "editor::GoToDefinitionSplit"
     }
+  },
+  {
+    "context": "Workspace && !Terminal",
+    "unbind": {
+      "cmd-shift-r": "task::Spawn"
+    }
+  },
+  {
+    "context": "Pane",
+    "bindings": {
+      "cmd-shift-r": "search::ToggleReplace"
+    }
+  },
+  {
+    "context": "Pane",
+    "unbind": {
+      "cmd-shift-h": "search::ToggleReplace"
+    }
   }
 ]
