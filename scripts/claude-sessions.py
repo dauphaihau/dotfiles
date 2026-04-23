@@ -3,30 +3,58 @@
 Claude Code session viewer — shows sessions with first-message topics, tokens, and cost.
 
 Flags:
-  --project atlas      filter by project path (partial match)
-  --since 2026-04-01   show sessions on or after date
-  --until 2026-04-30   show sessions on or before date
-  --limit 20           max sessions to show (default: 50)
-  --compact            narrower topic column
-  --json               machine-readable output
+  -p, --project atlas      filter by project path (partial match)
+  -s, --since 2026-04-01   show sessions on or after date
+  -u, --until 2026-04-30   show sessions on or before date
+  -l, --limit 20           max sessions to show (default: 30)
+  -c, --compact            narrower topic column
+  -j, --json               machine-readable output
 """
 
 import json
 import glob
 import os
-import sys
 import argparse
+from datetime import datetime
+from urllib.request import urlopen
+from urllib.error import URLError
 
-MODEL_PRICING = {
-    'claude-opus-4-7':  (15.0, 1.5, 75.0),
-    'claude-opus-4-5':  (15.0, 1.5, 75.0),
-    'claude-sonnet-4-6': (3.0, 0.3, 15.0),
-    'claude-sonnet-4-5': (3.0, 0.3, 15.0),
-    'claude-haiku-4-5':  (0.8, 0.08, 4.0),
+LITELLM_PRICING_URL = 'https://raw.githubusercontent.com/BerriAI/litellm/main/model_prices_and_context_window.json'
+
+FALLBACK_PRICING: dict[str, tuple] = {
+    'claude-opus-4-7':   (15.0, 1.5,  75.0),
+    'claude-opus-4-5':   (15.0, 1.5,  75.0),
+    'claude-sonnet-4-6':  (3.0, 0.3,  15.0),
+    'claude-sonnet-4-5':  (3.0, 0.3,  15.0),
+    'claude-haiku-4-5':   (0.8, 0.08,  4.0),
 }
 
+_litellm_cache: dict | None = None
+
+
+def fetch_litellm_pricing() -> dict:
+    global _litellm_cache
+    if _litellm_cache is not None:
+        return _litellm_cache
+    try:
+        with urlopen(LITELLM_PRICING_URL, timeout=5) as resp:
+            _litellm_cache = json.loads(resp.read())
+    except (URLError, Exception):
+        _litellm_cache = {}
+    return _litellm_cache
+
+
 def get_pricing(model: str) -> tuple:
-    for key, prices in MODEL_PRICING.items():
+    """Return (input_per_mtok, cache_read_per_mtok, output_per_mtok)."""
+    pricing = fetch_litellm_pricing()
+    entry = pricing.get(model)
+    if entry and 'input_cost_per_token' in entry:
+        return (
+            entry['input_cost_per_token'] * 1_000_000,
+            entry.get('cache_read_input_token_cost', entry['input_cost_per_token'] * 0.1) * 1_000_000,
+            entry['output_cost_per_token'] * 1_000_000,
+        )
+    for key, prices in FALLBACK_PRICING.items():
         if key in model:
             return prices
     return (3.0, 0.3, 15.0)
@@ -34,9 +62,13 @@ def get_pricing(model: str) -> tuple:
 
 def compute_cost(usage: dict, model: str) -> float:
     input_p, cache_read_p, output_p = get_pricing(model)
+    cache_creation_p = get_pricing(model)[0]  # same as input
+    pricing = fetch_litellm_pricing().get(model, {})
+    if 'cache_creation_input_token_cost' in pricing:
+        cache_creation_p = pricing['cache_creation_input_token_cost'] * 1_000_000
     return (
         usage.get('input_tokens', 0) * input_p / 1_000_000
-        + usage.get('cache_creation_input_tokens', 0) * input_p / 1_000_000
+        + usage.get('cache_creation_input_tokens', 0) * cache_creation_p / 1_000_000
         + usage.get('cache_read_input_tokens', 0) * cache_read_p / 1_000_000
         + usage.get('output_tokens', 0) * output_p / 1_000_000
     )
@@ -56,6 +88,11 @@ def extract_text(content) -> str:
 
 def is_system_message(text: str) -> bool:
     return text.startswith('<') or not text
+
+
+def _fmt_local(ts: str) -> str:
+    dt = datetime.fromisoformat(ts.replace('Z', '+00:00')).astimezone()
+    return dt.strftime('%H:%M') + '  ' + dt.strftime('%Y-%m-%d')
 
 
 def short_project(cwd: str) -> str:
@@ -118,7 +155,8 @@ def read_session(filepath: str) -> dict | None:
         'topic': first_msg or '(no message)',
         'totalTokens': total_tokens,
         'totalCost': total_cost,
-        'lastActivity': last_ts[:10],
+        'lastActivity': _fmt_local(last_ts),
+        'lastActivityTs': last_ts,
     }
 
 
@@ -126,15 +164,18 @@ def main() -> None:
     parser = argparse.ArgumentParser(
         description='Claude Code session viewer with topics',
         formatter_class=argparse.RawDescriptionHelpFormatter,
-        epilog='Examples:\n  claude-sessions\n  claude-sessions --project atlas\n  claude-sessions --since 2026-04-01\n  claude-sessions --json',
+        epilog='Examples:\n  claude-sessions\n  claude-sessions -p atlas\n  claude-sessions -s 2026-04-01\n  claude-sessions -j',
     )
-    parser.add_argument('--project', help='Filter by project path (partial match)')
-    parser.add_argument('--since', help='Show sessions on or after date (YYYY-MM-DD)')
-    parser.add_argument('--until', help='Show sessions on or before date (YYYY-MM-DD)')
-    parser.add_argument('--json', action='store_true', dest='as_json', help='Output as JSON')
-    parser.add_argument('--compact', action='store_true', help='Narrow topic column')
-    parser.add_argument('--limit', type=int, default=50, help='Max sessions to show (default: 50)')
+    parser.add_argument('-p', '--project', help='Filter by project path (partial match)')
+    parser.add_argument('-s', '--since', help='Show sessions on or after date (YYYY-MM-DD)')
+    parser.add_argument('-u', '--until', help='Show sessions on or before date (YYYY-MM-DD)')
+    parser.add_argument('-j', '--json', action='store_true', dest='as_json', help='Output as JSON')
+    parser.add_argument('-c', '--compact', action='store_true', help='Narrow topic column')
+    parser.add_argument('-l', '--limit', type=int, default=30, help='Max sessions to show (default: 30)')
     args = parser.parse_args()
+
+    # Fetch pricing once up front so all sessions share the same cached data
+    fetch_litellm_pricing()
 
     base = os.path.expanduser('~/.claude/projects/')
     files = glob.glob(base + '**/*.jsonl', recursive=True)
@@ -146,13 +187,13 @@ def main() -> None:
             continue
         if args.project and args.project.lower() not in s['project'].lower():
             continue
-        if args.since and s['lastActivity'] < args.since:
+        if args.since and s['lastActivityTs'][:10] < args.since:
             continue
-        if args.until and s['lastActivity'] > args.until:
+        if args.until and s['lastActivityTs'][:10] > args.until:
             continue
         sessions.append(s)
 
-    sessions.sort(key=lambda s: s['lastActivity'], reverse=True)
+    sessions.sort(key=lambda s: s['lastActivityTs'], reverse=True)
     sessions = sessions[: args.limit]
 
     if args.as_json:
