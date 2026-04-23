@@ -9,6 +9,7 @@ alias ccum='bunx ccusage monthly'
 alias ccus='bunx ccusage session'
 alias ccub='bunx ccusage blocks'
 alias ccusi='bunx ccusage session --id'  # usage: ccusi <session-id>
+alias ccust='python3 /Volumes/Local/dev/pj-personal/dotfiles/scripts/claude-sessions.py'  # sessions with topics
 
 # tlrc → replace man
 if command -v tlrc &>/dev/null; then
