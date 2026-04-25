@@ -264,5 +264,29 @@
     "unbind": {
       "cmd-shift-h": "search::ToggleReplace"
     }
+  },
+  {
+    "context": "Workspace",
+    "unbind": {
+      "cmd-shift-s": "workspace::SaveAs"
+    }
+  },
+  {
+    "context": "RulesLibrary",
+    "unbind": {
+      "cmd-shift-s": "rules_library::ToggleDefaultRule"
+    }
+  },
+  {
+    "context": "Workspace",
+    "bindings": {
+      "cmd-shift-s": "multi_workspace::ToggleWorkspaceSidebar"
+    }
+  },
+  {
+    "context": "Workspace",
+    "unbind": {
+      "alt-cmd-j": "multi_workspace::ToggleWorkspaceSidebar"
+    }
   }
 ]
