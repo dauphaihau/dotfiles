@@ -63,6 +63,9 @@ gwb() { # navigate to repo, checkout base branch, create new branch
 gpickm() { git cherry-pick $(git log --oneline ${1:---all} | fzf -m | awk '{print $1}'); }
 
 
+# Tags
+alias gtl='git tag --sort=-version:refname'
+
 # GitHub
 ghprc() { [[ -z "$1" ]] && echo "Usage: ghprc <target-branch>" && return 1; gh pr create --base "$1"; }
 alias ghprl='gh pr list'
