@@ -288,5 +288,27 @@
     "unbind": {
       "alt-cmd-j": "multi_workspace::ToggleWorkspaceSidebar"
     }
+  },
+  {
+    "context": "Workspace",
+    "bindings": {
+      "cmd-shift-r": [
+        "projects::OpenRecent",
+        {
+          "create_new_window": false
+        }
+      ]
+    }
+  },
+  {
+    "context": "Workspace",
+    "unbind": {
+      "alt-cmd-o": [
+        "projects::OpenRecent",
+        {
+          "create_new_window": false
+        }
+      ]
+    }
   }
 ]
