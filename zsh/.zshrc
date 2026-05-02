@@ -20,7 +20,7 @@ for f in ~/.aliases/*.sh; do [ -f "$f" ] && source "$f"; done
 
 eval "$(starship init zsh)"
 
-[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
+# [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
 
 # Keep Volta shims ahead of any Node version manager PATH changes.
 export VOLTA_HOME="$HOME/.volta"

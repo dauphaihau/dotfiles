@@ -10,7 +10,7 @@ alias gdp='git diff | bat --style=plain'
 
  # Log ( prefix gl )
 alias gl='git log --oneline --decorate'
-gls() { git log --oneline ${1:---all} | fzf | awk '{print $1}'; } # git search log
+glogs() { git log --oneline ${1:---all} | fzf | awk '{print $1}'; } # git search log
 
 # Staging / Commit
 alias ga='git add -A'
