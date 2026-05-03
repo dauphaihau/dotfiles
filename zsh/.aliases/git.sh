@@ -32,6 +32,7 @@ gp() { if [[ -z "$1" ]]; then git pull; else echo "Pulling branch: $1"; git fetc
 gpu() { if [[ -z "$1" ]]; then git push -u origin HEAD; else echo "Pushing branch: $1"; git push origin "$1"; fi; }
 
 # Branch ( prefix gb )
+gbsd() { [[ -z "$1" ]] && echo "Usage: gbsd <branch>" && return 1; git remote set-head origin "$1"; } # git branch set default
 alias gbl='git branch' # list local branches
 alias gba='git branch -a -vv' # list also remote branches
 alias gbd='git branch -d' # safe delete, fails if unmerged
