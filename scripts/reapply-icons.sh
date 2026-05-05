@@ -29,7 +29,7 @@ run_icon() {
         firefox)  apply_icon "/Applications/Firefox Developer Edition.app"  "$SCRIPT_DIR/../custom-icons-app/firefox.icns" ;;
         wallper)  apply_icon "/Applications/Wallper.app"                    "$SCRIPT_DIR/../custom-icons-app/wallper.icns" ;;
         sigmaos)  apply_icon "/Applications/SigmaOS.app"                    "$SCRIPT_DIR/../custom-icons-app/sigma-os.icns" ;;
-        chatgpt)  apply_icon "/Applications/ChatGPT.app"                    "$SCRIPT_DIR/../custom-icons-app/chat-gpt.icns" ;;
+        codex)    apply_icon "/Applications/Codex.app"                      "$SCRIPT_DIR/../custom-icons-app/dark-chat-gpt.icns" ;;
         zed)      apply_icon "/Applications/Zed.app"                        "$SCRIPT_DIR/../custom-icons-app/zed-ide.icns" ;;
         safari)   apply_icon "/Applications/Safari Technology Preview.app"  "$SCRIPT_DIR/../custom-icons-app/safari.icns" ;;
         webstorm)   apply_icon "/Applications/Webstorm.app"                 "$SCRIPT_DIR/../custom-icons-app/webstorm.icns" ;;
