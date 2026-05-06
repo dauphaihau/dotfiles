@@ -8,8 +8,16 @@ gdb() { [[ -z "$1" ]] && echo "Usage: gdb <branch>" && return 1; git diff "$1"..
 # gshow() { git show ${1:-HEAD} | bat --style=plain; }
 alias gdp='git diff | bat --style=plain'
 
- # Log ( prefix gl )
+# Log ( prefix gl, log commits ) 
 alias gl='git log --oneline --decorate'
+glb() { [[ -z "$1" ]] && echo "Usage: glb <branch>" && return 1; git log --oneline --decorate "$1"; } # log commits from a specific branch
+glu() { # log commits not pushed to remote
+  git rev-parse --abbrev-ref --symbolic-full-name '@{u}' >/dev/null 2>&1 || {
+    echo "No upstream configured for current branch"
+    return 1
+  }
+  git log --oneline --decorate '@{u}'..HEAD
+}
 glogs() { git log --oneline ${1:---all} | fzf | awk '{print $1}'; } # git search log
 
 # Staging / Commit
