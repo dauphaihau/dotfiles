@@ -1,5 +1,33 @@
-# download audio as mp3
-dlm() { yt-dlp -x --audio-format mp3 "$1" }
+# download audio as mp3, optionally clipping with --range "*MM:SS-HH:MM:SS" or "*MM:SS-inf"
+dlm() {
+  local url="$1"
+  shift
+  local range=""
+  local -a extra_args=()
+
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      --range)
+        range="$2"
+        shift 2
+        ;;
+      *)
+        extra_args+=("$1")
+        shift
+        ;;
+    esac
+  done
+
+  local -a args=(
+    -x
+    --audio-format mp3
+  )
+
+  [[ -n "$range" ]] && args+=(--download-sections "$range" --force-keyframes-at-cuts)
+  args+=("${extra_args[@]}")
+
+  yt-dlp "${args[@]}" "$url"
+}
 
 # download video: download video as mp4 (best h264 quality) + embed caption as Finder comment
 dlv() {
