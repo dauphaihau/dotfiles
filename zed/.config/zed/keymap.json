@@ -310,5 +310,10 @@
         }
       ]
     }
+  },
+  {
+    "bindings": {
+      "cmd-g": "git_graph::Open"
+    }
   }
 ]
