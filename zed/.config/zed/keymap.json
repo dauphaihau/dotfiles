@@ -271,12 +271,12 @@
       "cmd-shift-s": "workspace::SaveAs"
     }
   },
-  {
-    "context": "RulesLibrary",
-    "unbind": {
-      "cmd-shift-s": "rules_library::ToggleDefaultRule"
-    }
-  },
+  // {
+  //   "context": "RulesLibrary",
+  //   "unbind": {
+  //     "cmd-shift-s": "rules_library::ToggleDefaultRule"
+  //   }
+  // },
   {
     "context": "Workspace",
     "bindings": {
