@@ -233,12 +233,12 @@
   },
   {
     "bindings": {
-      "cmd-shift-c": "editor::CopyPath"
+      "cmd-shift-c": "workspace::CopyPath"
     }
   },
   {
     "bindings": {
-      "cmd-shift-c": "editor::CopyRelativePath"
+      "cmd-shift-c": "workspace::CopyRelativePath"
     }
   },
   {
