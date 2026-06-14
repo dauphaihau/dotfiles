@@ -102,7 +102,7 @@ dlv() {
   fi
 }
 
-# download instagram images/carousels via gallery-dl
+# download instagram images/carousels via gallery-dl into the current directory
 # usage: dlig <instagram-url> [gallery-dl args...]
 # note: private or rate-limited posts usually require browser cookies, e.g.
 #   dlig <url> --cookies-from-browser safari
@@ -116,6 +116,7 @@ dlig() {
   fi
 
   gallery-dl \
+    -D . \
     "$@" \
     "$url"
 }
