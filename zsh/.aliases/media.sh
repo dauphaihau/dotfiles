@@ -102,6 +102,24 @@ dlv() {
   fi
 }
 
+# download instagram images/carousels via gallery-dl
+# usage: dlig <instagram-url> [gallery-dl args...]
+# note: private or rate-limited posts usually require browser cookies, e.g.
+#   dlig <url> --cookies-from-browser safari
+dlig() {
+  local url="$1"
+  shift
+
+  if ! command -v gallery-dl >/dev/null 2>&1; then
+    echo "gallery-dl is not installed. Install it with: brew install gallery-dl" >&2
+    return 127
+  fi
+
+  gallery-dl \
+    "$@" \
+    "$url"
+}
+
 # set mp3 metadata tags: mtag -f <file> [-t title] [-a artist] [-i image] [-l lyrics]
 mtag() {
   local title artist file image lyrics
