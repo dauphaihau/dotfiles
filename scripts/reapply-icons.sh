@@ -35,7 +35,6 @@ run_icon() {
         webstorm)   apply_icon "/Applications/Webstorm.app"                 "$SCRIPT_DIR/../custom-icons-app/webstorm.icns" ;;
         cursor)   apply_icon "/Applications/Cursor.app"                   "$SCRIPT_DIR/../custom-icons-app/cursor.icns" ;;
         steam)   apply_icon "/Applications/Steam.app"                   "$SCRIPT_DIR/../custom-icons-app/steam.icns" ;;
-        notion)   apply_icon "/Applications/Notion.app"                   "$SCRIPT_DIR/../custom-icons-app/notion.icns" ;;
         *)        echo "Unknown app: $1. Available: zalo whatsapp firefox wallper sigmaos chatgpt zed safari" ;;
     esac
 }
