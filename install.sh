@@ -90,6 +90,7 @@ FORMULAE=(
   ffmpeg
   eyed3
   yt-dlp
+  streamlink
   gallery-dl
 )
 
