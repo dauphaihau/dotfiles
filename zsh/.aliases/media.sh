@@ -35,11 +35,19 @@ dlv() {
   shift
   local range=""
   local -a extra_args=()
+  local -a auth_args=()
+  local has_cookie_args=0
 
   while [[ $# -gt 0 ]]; do
     case "$1" in
       --range)
         range="$2"
+        shift 2
+        ;;
+      --cookies|--cookies-from-browser)
+        has_cookie_args=1
+        extra_args+=("$1")
+        [[ -n "$2" ]] && extra_args+=("$2")
         shift 2
         ;;
       *)
@@ -49,8 +57,13 @@ dlv() {
     esac
   done
 
+  if [[ "$url" == *"instagram.com"* && $has_cookie_args -eq 0 ]]; then
+    auth_args+=(--cookies-from-browser firefox)
+  fi
+
   local desc
   desc=$(yt-dlp \
+    "${auth_args[@]}" \
     --print "%(description)s" \
     --no-download \
     "$url" 2>/dev/null)
@@ -59,7 +72,7 @@ dlv() {
   tmpfile=$(mktemp)
 
   local -a args=(
-    -f "bestvideo[vcodec^=avc]+bestaudio/best"          # best h264 video + best audio
+    -f "bv*[vcodec^=avc1]+ba/b[ext=mp4]/b"              # prefer Mac-friendly H.264/AAC output
     --merge-output-format mp4                            # mux into mp4 container
     --embed-metadata                                     # embed title/uploader/etc into file
     --add-metadata                                       # write metadata tags (date, description…)
@@ -69,6 +82,7 @@ dlv() {
   )
 
   [[ -n "$range" ]] && args+=(--download-sections "$range" --force-keyframes-at-cuts)
+  args+=("${auth_args[@]}")
   args+=("${extra_args[@]}")
 
   yt-dlp "${args[@]}" "$url"
@@ -94,6 +108,20 @@ dlv() {
     local tmpvid="${filepath%.mp4}_fix.mp4"
     ffmpeg -y -loglevel error -i "$filepath" -t "$clip_duration" -c copy "$tmpvid" \
       && mv "$tmpvid" "$filepath"
+  fi
+
+  # QuickTime and Finder previews often fail on VP9/AV1 in MP4; normalize to H.264/AAC.
+  if [[ -n "$filepath" ]] && command -v ffprobe >/dev/null 2>&1 && command -v ffmpeg >/dev/null 2>&1; then
+    local vcodec=""
+    vcodec=$(ffprobe -v error -select_streams v:0 -show_entries stream=codec_name -of csv=p=0 "$filepath" 2>/dev/null)
+
+    if [[ "$vcodec" == "vp9" || "$vcodec" == "av1" ]]; then
+      local compat_tmp="${filepath%.mp4}_h264.mp4"
+      ffmpeg -y -loglevel error -i "$filepath" \
+        -c:v libx264 -preset medium -crf 23 \
+        -c:a aac -b:a 128k \
+        "$compat_tmp" && mv "$compat_tmp" "$filepath"
+    fi
   fi
 
   if [[ -n "$desc" && -n "$filepath" ]]; then
