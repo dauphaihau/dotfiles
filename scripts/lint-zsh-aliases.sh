@@ -14,6 +14,7 @@ Lint zsh alias/function definitions for:
 If no files are provided, the script scans:
   - ~/.zshrc
   - ~/.aliases/*.sh
+  - ~/.aliases/*/*.sh
 
 Options:
   --allow NAME    Ignore collisions and risky override warnings for NAME
@@ -49,7 +50,7 @@ done
 if (( ${#input_files[@]} == 0 )); then
   input_files+=("$HOME/.zshrc")
   if [[ -d "$HOME/.aliases" || -L "$HOME/.aliases" ]]; then
-    input_files+=("$HOME"/.aliases/*.sh(N))
+    input_files+=("$HOME"/.aliases/*.sh(N) "$HOME"/.aliases/*/*.sh(N))
   fi
 fi
 

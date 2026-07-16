@@ -16,7 +16,11 @@ source $ZSH/oh-my-zsh.sh
 
 # Clear all OMZ aliases, then load only custom ones
 unalias -a
-for f in ~/.aliases/*.sh; do [ -f "$f" ] && source "$f"; done
+typeset -a alias_files
+alias_files=(~/.aliases/*.sh(N) ~/.aliases/*/*.sh(N))
+for f in "${alias_files[@]}"; do
+  source "$f"
+done
 
 eval "$(starship init zsh)"
 
