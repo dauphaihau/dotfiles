@@ -1,5 +1,5 @@
 # download audio as mp3, optionally clipping with --range "*MM:SS-HH:MM:SS" or "*MM:SS-inf"
-dlm() {
+dla() {
   local url="$1"
   shift
   local range=""
