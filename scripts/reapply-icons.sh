@@ -22,6 +22,27 @@ apply_icon() {
         echo "$(date): FAIL — $APP_PATH" >> "$LOG"
 }
 
+apply_chatgpt_icon() {
+    local APP_PATH="/Applications/ChatGPT.app"
+    local ICON_PATH="$SCRIPT_DIR/../custom-icons-app/dark-chat-gpt.icns"
+    local BUNDLE_ICON_PATH="$APP_PATH/Contents/Resources/electron.icns"
+
+    apply_icon "$APP_PATH" "$ICON_PATH"
+
+    if [[ ! -d "$APP_PATH" ]]; then
+        return
+    fi
+
+    if [[ ! -f "$ICON_PATH" ]]; then
+        return
+    fi
+
+    cp "$ICON_PATH" "$BUNDLE_ICON_PATH" && \
+        touch "$APP_PATH" && \
+        echo "$(date): OK — updated ChatGPT bundle icon $BUNDLE_ICON_PATH" >> "$LOG" || \
+        echo "$(date): FAIL — ChatGPT bundle icon $BUNDLE_ICON_PATH" >> "$LOG"
+}
+
 run_icon() {
     case "$1" in
         zalo)     apply_icon "/Applications/Zalo.app"                       "$SCRIPT_DIR/../custom-icons-app/zalo.icns" ;;
@@ -29,7 +50,7 @@ run_icon() {
         firefox)  apply_icon "/Applications/Firefox Developer Edition.app"  "$SCRIPT_DIR/../custom-icons-app/firefox.icns" ;;
         wallper)  apply_icon "/Applications/Wallper.app"                    "$SCRIPT_DIR/../custom-icons-app/wallper.icns" ;;
         sigmaos)  apply_icon "/Applications/SigmaOS.app"                    "$SCRIPT_DIR/../custom-icons-app/sigma-os.icns" ;;
-        chatgpt)    apply_icon "/Applications/ChatGPT.app"                      "$SCRIPT_DIR/../custom-icons-app/dark-chat-gpt.icns" ;;
+        chatgpt)  apply_chatgpt_icon ;;
         zed)      apply_icon "/Applications/Zed.app"                        "$SCRIPT_DIR/../custom-icons-app/zed-ide.icns" ;;
         safari)   apply_icon "/Applications/Safari Technology Preview.app"  "$SCRIPT_DIR/../custom-icons-app/safari.icns" ;;
         webstorm)   apply_icon "/Applications/Webstorm.app"                 "$SCRIPT_DIR/../custom-icons-app/webstorm.icns" ;;
@@ -51,5 +72,7 @@ else
     done
 fi
 
-# Refresh Dock to show updated icons
+# Refresh Launch Services and Dock to show updated icons
+/System/Library/Frameworks/CoreServices.framework/Frameworks/LaunchServices.framework/Support/lsregister \
+    -kill -r -domain local -domain system -domain user
 killall Dock
