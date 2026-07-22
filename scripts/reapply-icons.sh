@@ -25,7 +25,21 @@ apply_icon() {
 apply_chatgpt_icon() {
     local APP_PATH="/Applications/ChatGPT.app"
     local ICON_PATH="$SCRIPT_DIR/../custom-icons-app/dark-chat-gpt.icns"
-    local BUNDLE_ICON_PATH="$APP_PATH/Contents/Resources/electron.icns"
+    local INFO_PLIST="$APP_PATH/Contents/Info.plist"
+    local PNG_ICON_PATH="/tmp/dark-chat-gpt.png"
+    local BUNDLE_ICON_PATHS=(
+        "$APP_PATH/Contents/Resources/electron.icns"
+        "$APP_PATH/Contents/Resources/app.icns"
+        "$APP_PATH/Contents/Resources/icon-chatgpt.icns"
+    )
+    local PNG_ICON_PATHS=(
+        "$APP_PATH/Contents/Resources/icon-chatgpt.png"
+        "$APP_PATH/Contents/Resources/default_app/icon.png"
+        "$APP_PATH/Contents/Resources/icon-codex-dark-color.png"
+        "$APP_PATH/Contents/Resources/icon-codex-light.png"
+    )
+    local BUNDLE_ICON_PATH
+    local PNG_TARGET_PATH
 
     apply_icon "$APP_PATH" "$ICON_PATH"
 
@@ -37,10 +51,47 @@ apply_chatgpt_icon() {
         return
     fi
 
-    cp "$ICON_PATH" "$BUNDLE_ICON_PATH" && \
-        touch "$APP_PATH" && \
-        echo "$(date): OK — updated ChatGPT bundle icon $BUNDLE_ICON_PATH" >> "$LOG" || \
-        echo "$(date): FAIL — ChatGPT bundle icon $BUNDLE_ICON_PATH" >> "$LOG"
+    for BUNDLE_ICON_PATH in "${BUNDLE_ICON_PATHS[@]}"; do
+        cp "$ICON_PATH" "$BUNDLE_ICON_PATH" && \
+            echo "$(date): OK — updated ChatGPT bundle icon $BUNDLE_ICON_PATH" >> "$LOG" || \
+            echo "$(date): FAIL — ChatGPT bundle icon $BUNDLE_ICON_PATH" >> "$LOG"
+    done
+
+    if [[ -f "$INFO_PLIST" ]]; then
+        /usr/libexec/PlistBuddy -c "Set :CFBundleIconFile electron.icns" "$INFO_PLIST" 2>/dev/null || true
+        /usr/libexec/PlistBuddy -c "Delete :CFBundleIconName" "$INFO_PLIST" 2>/dev/null || true
+        echo "$(date): OK — configured ChatGPT to use CFBundleIconFile" >> "$LOG"
+    fi
+
+    if sips -s format png "$ICON_PATH" --out "$PNG_ICON_PATH" >/dev/null 2>&1; then
+        for PNG_TARGET_PATH in "${PNG_ICON_PATHS[@]}"; do
+            cp "$PNG_ICON_PATH" "$PNG_TARGET_PATH" && \
+                echo "$(date): OK — updated ChatGPT PNG icon $PNG_TARGET_PATH" >> "$LOG" || \
+                echo "$(date): FAIL — ChatGPT PNG icon $PNG_TARGET_PATH" >> "$LOG"
+        done
+    else
+        echo "$(date): FAIL — could not convert ChatGPT icon to PNG" >> "$LOG"
+    fi
+
+    touch "$APP_PATH"
+}
+
+refresh_icon_caches() {
+    local USER_CACHE_DIR
+
+    USER_CACHE_DIR="$(dirname "$(dirname "$TMPDIR")")/C"
+
+    if [[ -d "$USER_CACHE_DIR" ]]; then
+        rm -rf "$USER_CACHE_DIR/com.apple.dock.iconcache" \
+               "$USER_CACHE_DIR/com.apple.iconservices"
+    fi
+
+    /System/Library/Frameworks/CoreServices.framework/Frameworks/LaunchServices.framework/Support/lsregister \
+        -kill -r -domain local -domain system -domain user
+
+    killall iconservicesagent 2>/dev/null || true
+    killall Finder 2>/dev/null || true
+    killall Dock
 }
 
 run_icon() {
@@ -72,7 +123,5 @@ else
     done
 fi
 
-# Refresh Launch Services and Dock to show updated icons
-/System/Library/Frameworks/CoreServices.framework/Frameworks/LaunchServices.framework/Support/lsregister \
-    -kill -r -domain local -domain system -domain user
-killall Dock
+# Refresh macOS icon caches to show updated icons
+refresh_icon_caches
