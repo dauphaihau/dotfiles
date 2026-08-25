@@ -1,0 +1,103 @@
+# .omp/config.yml
+
+tools:
+  # Allow normal file reads/edits.
+  # Ask before executing commands unless explicitly allowed below.
+  approvalMode: write
+
+  approval:
+    read: allow
+    edit: allow
+    bash: prompt
+
+bash:
+  patterns:
+    # --------------------------------------------------
+    # DENY — obviously destructive
+    # --------------------------------------------------
+
+    - match: "rm -rf *"
+      approval: deny
+
+    # --------------------------------------------------
+    # ALLOW — read-only Git operations
+    # --------------------------------------------------
+
+    - match: "git status*"
+      approval: allow
+
+    - match: "git diff*"
+      approval: allow
+
+    - match: "git log*"
+      approval: allow
+
+    - match: "git show*"
+      approval: allow
+
+    - match: "git rev-parse*"
+      approval: allow
+
+    - match: "git submodule status*"
+      approval: allow
+
+    # --------------------------------------------------
+    # ALLOW — tests
+    # --------------------------------------------------
+
+    - match: "npm test*"
+      approval: allow
+
+    - match: "npm run test*"
+      approval: allow
+
+    - match: "pnpm test*"
+      approval: allow
+
+    - match: "pnpm run test*"
+      approval: allow
+
+    - match: "bun test*"
+      approval: allow
+
+    - match: "bun run test*"
+      approval: allow
+
+    # --------------------------------------------------
+    # ALLOW — lint
+    # --------------------------------------------------
+
+    - match: "npm run lint*"
+      approval: allow
+
+    - match: "pnpm lint*"
+      approval: allow
+
+    - match: "pnpm run lint*"
+      approval: allow
+
+    - match: "bun run lint*"
+      approval: allow
+
+    # --------------------------------------------------
+    # ALLOW — type checking
+    # --------------------------------------------------
+
+    - match: "npm run typecheck*"
+      approval: allow
+
+    - match: "pnpm typecheck*"
+      approval: allow
+
+    - match: "pnpm run typecheck*"
+      approval: allow
+
+    - match: "bun run typecheck*"
+      approval: allow
+
+    # --------------------------------------------------
+    # FALLBACK — anything not explicitly trusted
+    # --------------------------------------------------
+
+    - match: "*"
+      approval: prompt
