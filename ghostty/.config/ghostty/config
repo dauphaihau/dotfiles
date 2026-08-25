@@ -1,0 +1,21 @@
+macos-icon = custom
+
+background = #161616
+foreground = #7e79b1
+
+palette = 0=#3962a4
+palette = 1=#5662ac
+palette = 2=#7393fa
+palette = 3=#5248ba
+palette = 4=#5a50c2
+palette = 5=#463aca
+palette = 6=#d0d1fe
+palette = 7=#f1f1f1
+palette = 8=#8e8e8e
+palette = 9=#ffc4bd
+palette = 10=#d6fcb9
+palette = 11=#fefdd5
+palette = 12=#c1e3fe
+palette = 13=#ffb1fe
+palette = 14=#e5e6fe
+palette = 15=#feffff

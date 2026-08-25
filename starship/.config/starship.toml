@@ -1,0 +1,278 @@
+"$schema" = 'https://starship.rs/config-schema.json'
+palette = "auraaa"
+
+[palettes.auraaa]
+accent = "#3f31db"
+background = "#161616"
+foreground = "#7e79b1"
+normal_black = "#3962a4"
+normal_red = "#5662ac"
+normal_green = "#7393fa"
+normal_yellow = "#5248ba"
+normal_blue = "#5a50c2"
+normal_magenta = "#463aca"
+normal_cyan = "#d0d1fe"
+normal_white = "#f1f1f1"
+bright_black = "#8e8e8e"
+bright_red = "#ffc4bd"
+bright_green = "#d6fcb9"
+bright_yellow = "#fefdd5"
+bright_blue = "#c1e3fe"
+bright_magenta = "#ffb1fe"
+bright_cyan = "#e5e6fe"
+bright_white = "#feffff"
+
+[aws]
+symbol = " "
+style = "fg:normal_yellow"
+
+[buf]
+symbol = " "
+style = "fg:normal_blue"
+
+[bun]
+symbol = " "
+style = "fg:normal_magenta"
+
+[c]
+symbol = " "
+style = "fg:normal_blue"
+
+[cpp]
+symbol = " "
+style = "fg:normal_blue"
+
+[cmake]
+symbol = " "
+style = "fg:normal_cyan"
+
+[conda]
+symbol = " "
+style = "fg:normal_green"
+
+[crystal]
+symbol = " "
+style = "fg:bright_cyan"
+
+[dart]
+symbol = " "
+style = "fg:normal_cyan"
+
+[deno]
+symbol = " "
+style = "fg:foreground"
+
+[directory]
+read_only = " 󰌾"
+style = "bold fg:accent"
+
+[docker_context]
+symbol = " "
+style = "fg:normal_cyan"
+
+[elixir]
+symbol = " "
+style = "fg:normal_magenta"
+
+[elm]
+symbol = " "
+style = "fg:normal_cyan"
+
+[fennel]
+symbol = " "
+style = "fg:normal_green"
+
+[fortran]
+symbol = " "
+style = "fg:normal_blue"
+
+[fossil_branch]
+symbol = " "
+style = "fg:normal_magenta"
+
+[gcloud]
+symbol = " "
+style = "fg:normal_blue"
+
+[git_branch]
+symbol = " "
+style = "bold fg:normal_magenta"
+
+[git_commit]
+tag_symbol = '  '
+style = "fg:normal_yellow"
+
+[golang]
+symbol = " "
+style = "fg:normal_cyan"
+
+[gradle]
+symbol = " "
+style = "fg:normal_blue"
+
+[guix_shell]
+symbol = " "
+style = "fg:normal_green"
+
+[haskell]
+symbol = " "
+style = "fg:normal_magenta"
+
+[haxe]
+symbol = " "
+style = "fg:normal_yellow"
+
+[hg_branch]
+symbol = " "
+style = "fg:normal_magenta"
+
+[hostname]
+ssh_symbol = " "
+style = "fg:foreground"
+
+[java]
+symbol = " "
+style = "fg:normal_red"
+
+[julia]
+symbol = " "
+style = "fg:normal_magenta"
+
+[kotlin]
+symbol = " "
+style = "fg:normal_blue"
+
+[lua]
+symbol = " "
+style = "fg:normal_blue"
+
+[memory_usage]
+symbol = "󰍛 "
+style = "fg:normal_yellow"
+
+[meson]
+symbol = "󰔷 "
+style = "fg:normal_cyan"
+
+[nim]
+symbol = "󰆥 "
+style = "fg:normal_yellow"
+
+[nix_shell]
+symbol = " "
+style = "fg:normal_cyan"
+
+[nodejs]
+symbol = " "
+style = "fg:normal_green"
+
+[ocaml]
+symbol = " "
+style = "fg:normal_yellow"
+
+[os.symbols]
+Alpaquita = " "
+Alpine = " "
+AlmaLinux = " "
+Amazon = " "
+Android = " "
+AOSC = " "
+Arch = " "
+Artix = " "
+CachyOS = " "
+CentOS = " "
+Debian = " "
+DragonFly = " "
+Elementary = " "
+Emscripten = " "
+EndeavourOS = " "
+Fedora = " "
+FreeBSD = " "
+Garuda = "󰛓 "
+Gentoo = " "
+HardenedBSD = "󰞌 "
+Illumos = "󰈸 "
+Ios = "󰀷 "
+Kali = " "
+Linux = " "
+Mabox = " "
+Macos = " "
+Manjaro = " "
+Mariner = " "
+MidnightBSD = " "
+Mint = " "
+NetBSD = " "
+NixOS = " "
+Nobara = " "
+OpenBSD = "󰈺 "
+openSUSE = " "
+OracleLinux = "󰌷 "
+Pop = " "
+Raspbian = " "
+Redhat = " "
+RedHatEnterprise = " "
+RockyLinux = " "
+Redox = "󰀘 "
+Solus = "󰠳 "
+SUSE = " "
+Ubuntu = " "
+Unknown = " "
+Void = " "
+Windows = "󰍲 "
+Zorin = " "
+
+[package]
+symbol = "󰏗 "
+style = "fg:normal_yellow"
+
+[perl]
+symbol = " "
+style = "fg:normal_blue"
+
+[php]
+symbol = " "
+style = "fg:normal_blue"
+
+[pijul_channel]
+symbol = " "
+style = "fg:normal_magenta"
+
+[pixi]
+symbol = "󰏗 "
+style = "fg:normal_yellow"
+
+[python]
+symbol = " "
+style = "fg:normal_green"
+
+[rlang]
+symbol = "󰟔 "
+style = "fg:normal_blue"
+
+[ruby]
+symbol = " "
+style = "fg:normal_red"
+
+[rust]
+symbol = "󱘗 "
+style = "fg:normal_red"
+
+[scala]
+symbol = " "
+style = "fg:normal_red"
+
+[status]
+symbol = " "
+style = "bold fg:bright_red"
+
+[swift]
+symbol = " "
+style = "fg:normal_red"
+
+[xmake]
+symbol = " "
+style = "fg:normal_cyan"
+
+[zig]
+symbol = " "
+style = "fg:normal_yellow"

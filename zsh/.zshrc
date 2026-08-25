@@ -39,6 +39,7 @@ export PATH="$VOLTA_HOME/bin:$PATH"
 if command -v wt >/dev/null 2>&1; then eval "$(command wt config shell init zsh)"; fi
 
 export PATH="$HOME/go/bin:$PATH"
+export PATH="/opt/homebrew/opt/postgresql@17/bin:$PATH"
 
 # atlas-cli
 export ATLAS_BACKEND_PATH="/Volumes/Local/dev/pj-personal/apps/atlas/apps/api"
@@ -52,6 +53,9 @@ export ATLAS_PHP_CONTAINER="atlas-php"
 # zsh completions
 fpath=(~/.zsh/completions $fpath)
 autoload -U compinit && compinit
+
+# Use vi mode for every interactive zsh session.
+bindkey -v
 
 devcopy() {
   local tmp_file url
