@@ -1,5 +1,5 @@
 "$schema" = 'https://starship.rs/config-schema.json'
-palette = "auraaa"
+palette = "github_light"
 
 [palettes.auraaa]
 accent = "#3f31db"
@@ -21,6 +21,27 @@ bright_blue = "#c1e3fe"
 bright_magenta = "#ffb1fe"
 bright_cyan = "#e5e6fe"
 bright_white = "#feffff"
+
+[palettes.github_light]
+accent = "#FD8C73"
+background = "#ffffff"
+foreground = "#57606a"
+normal_black = "#24292f"
+normal_red = "#ff8182"
+normal_green = "#1a7f37"
+normal_yellow = "#d4a72c"
+normal_blue = "#0969da"
+normal_magenta = "#c297ff"
+normal_cyan = "#1b7c83"
+normal_white = "#d0d7de"
+bright_black = "#32383f"
+bright_red = "#ffaba8"
+bright_green = "#6fdd8b"
+bright_yellow = "#eac54f"
+bright_blue = "#80ccff"
+bright_magenta = "#d8b9ff"
+bright_cyan = "#b3f0ff"
+bright_white = "#d0d7de"
 
 [aws]
 symbol = " "
