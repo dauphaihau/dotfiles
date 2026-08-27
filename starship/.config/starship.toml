@@ -1,5 +1,5 @@
 "$schema" = 'https://starship.rs/config-schema.json'
-palette = "github_light"
+palette = "auraaa"
 
 [palettes.auraaa]
 accent = "#3f31db"
