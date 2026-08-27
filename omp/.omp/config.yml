@@ -1,5 +1,10 @@
 # .omp/config.yml
 
+modelRoles:
+  default: openai-codex/gpt-5.5:medium
+  smol: openai-codex/gpt-5.5:low
+  slow: openai-codex/gpt-5.5:high
+
 tools:
   # Allow normal file reads/edits.
   # Ask before executing commands unless explicitly allowed below.
