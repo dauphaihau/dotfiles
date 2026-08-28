@@ -1,10 +1,13 @@
 # make Finder/Quick Look use a useful MP4 thumbnail frame
-# usage: mp4thumb input.mp4 [hold_seconds]
-# usage: mp4thumb --force input.mp4 [hold_seconds]
-# usage: mp4thumb --at 52 input.mp4 [hold_seconds]
-mp4thumb() {
+# --force: replace an existing <original-name>-thumbnail.mp4; never overwrites the original input
+# usage: vthumb input.mp4 [hold_seconds]
+# usage: vthumb input.mp4 --at 52 --hold 0.05
+# usage: vthumb --force --at 1:02 --hold 0.05 input.mp4
+vthumb() {
   local force=0
   local thumb_at=""
+  local hold_seconds=""
+  local -a positional=()
 
   while [[ $# -gt 0 ]]; do
     case "$1" in
@@ -13,6 +16,10 @@ mp4thumb() {
         shift
         ;;
       --at)
+        if [[ -z "$2" ]]; then
+          echo "--at requires a timestamp, for example: --at 52, --at 1:02, or --at 1:02.5" >&2
+          return 2
+        fi
         thumb_at="$2"
         shift 2
         ;;
@@ -20,30 +27,49 @@ mp4thumb() {
         thumb_at="${1#--at=}"
         shift
         ;;
+      --hold)
+        if [[ -z "$2" ]]; then
+          echo "--hold requires seconds, for example: --hold 0.05 or --hold 0.5" >&2
+          return 2
+        fi
+        hold_seconds="$2"
+        shift 2
+        ;;
+      --hold=*)
+        hold_seconds="${1#--hold=}"
+        shift
+        ;;
       --help|-h)
-        echo "usage: mp4thumb [--force] [--at seconds] input.mp4 [hold_seconds]" >&2
+        echo "usage: vthumb [--force] [--at seconds|M:SS|H:MM:SS] [--hold seconds] input.mp4 [hold_seconds]" >&2
         return 0
         ;;
       --)
         shift
+        positional+=("$@")
         break
         ;;
       -*)
         echo "unknown option: $1" >&2
-        echo "usage: mp4thumb [--force] [--at seconds] input.mp4 [hold_seconds]" >&2
+        echo "usage: vthumb [--force] [--at seconds|M:SS|H:MM:SS] [--hold seconds] input.mp4 [hold_seconds]" >&2
         return 2
         ;;
       *)
-        break
+        positional+=("$1")
+        shift
         ;;
     esac
   done
 
-  local input="$1"
-  local hold_seconds="${2:-0.75}"
+  local input="${positional[1]}"
+  [[ -z "$hold_seconds" ]] && hold_seconds="${positional[2]:-0.05}"
 
   if [[ -z "$input" ]]; then
-    echo "usage: mp4thumb [--force] [--at seconds] input.mp4 [hold_seconds]" >&2
+    echo "usage: vthumb [--force] [--at seconds|M:SS|H:MM:SS] [--hold seconds] input.mp4 [hold_seconds]" >&2
+    return 2
+  fi
+
+  if [[ ! "$hold_seconds" =~ '^[0-9]+([.][0-9]+)?$' ]]; then
+    echo "--hold must be seconds, for example: --hold 0.05 or --hold 0.5" >&2
     return 2
   fi
 
@@ -115,12 +141,18 @@ mp4thumb() {
 
   local black_log thumb_ts line black_end
   if [[ -n "$thumb_at" ]]; then
-    if [[ ! "$thumb_at" =~ '^[0-9]+([.][0-9]+)?$' ]]; then
-      echo "--at must be seconds, for example: --at 52 or --at 52.5" >&2
+    if [[ "$thumb_at" =~ '^[0-9]+([.][0-9]+)?$' ]]; then
+      thumb_ts="$thumb_at"
+    elif [[ "$thumb_at" =~ '^([0-9]+):([0-9]{1,2})([.][0-9]+)?$' ]]; then
+      thumb_ts=$(awk -v m="${match[1]}" -v s="${match[2]}${match[3]}" 'BEGIN { printf "%.3f", (m * 60) + s }')
+    elif [[ "$thumb_at" =~ '^([0-9]+):([0-9]{1,2}):([0-9]{1,2})([.][0-9]+)?$' ]]; then
+      thumb_ts=$(awk -v h="${match[1]}" -v m="${match[2]}" -v s="${match[3]}${match[4]}" 'BEGIN { printf "%.3f", (h * 3600) + (m * 60) + s }')
+    else
+      echo "--at must be seconds, M:SS, or H:MM:SS, for example: --at 52, --at 1:02, or --at 1:02.5" >&2
       return 2
     fi
 
-    thumb_ts=$(awk -v t="$thumb_at" -v d="$duration" 'BEGIN { if (t >= d) t = d > 0.20 ? d - 0.20 : 0; printf "%.3f", t }')
+    thumb_ts=$(awk -v t="$thumb_ts" -v d="$duration" 'BEGIN { if (t >= d) t = d > 0.20 ? d - 0.20 : 0; printf "%.3f", t }')
   else
     local scan_duration
     scan_duration=$(awk -v d="$duration" 'BEGIN { if (d > 30) print 30; else if (d > 0) print d; else print 30 }')
