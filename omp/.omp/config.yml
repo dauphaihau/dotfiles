@@ -13,16 +13,12 @@ bash:
     # Git inspection
     - match: "git status*"
       approval: allow
-
     - match: "git diff*"
       approval: allow
-
     - match: "git log*"
       approval: allow
-
     - match: "git show*"
       approval: allow
-
     - match: "git branch*"
       approval: allow
 
@@ -66,9 +62,7 @@ bash:
 
     - match: "pwd"
       approval: allow
-
     - match: "ls*"
       approval: allow
-
     - match: "*"
       approval: prompt
