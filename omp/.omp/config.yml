@@ -2,3 +2,73 @@ skills:
   includeSkills:
     - ask
     - commit-group
+
+tools:
+  approvalMode: write
+  approval:
+    bash: prompt
+
+bash:
+  patterns:
+    # Git inspection
+    - match: "git status*"
+      approval: allow
+
+    - match: "git diff*"
+      approval: allow
+
+    - match: "git log*"
+      approval: allow
+
+    - match: "git show*"
+      approval: allow
+
+    - match: "git branch*"
+      approval: allow
+
+    # pnpm verification
+    - match: "pnpm test*"
+      approval: allow
+    - match: "pnpm lint*"
+      approval: allow
+    - match: "pnpm check*"
+      approval: allow
+    - match: "pnpm typecheck*"
+      approval: allow
+
+    # bun verification
+    - match: "bun test*"
+      approval: allow
+    - match: "bun lint*"
+      approval: allow
+    - match: "bun check*"
+      approval: allow
+    - match: "bun run test*"
+      approval: allow
+    - match: "bun run lint*"
+      approval: allow
+    - match: "bun run check*"
+      approval: allow
+    - match: "bun run typecheck*"
+      approval: allow
+
+    # npm verification
+    - match: "npm test*"
+      approval: allow
+    - match: "npm run test*"
+      approval: allow
+    - match: "npm run lint*"
+      approval: allow
+    - match: "npm run check*"
+      approval: allow
+    - match: "npm run typecheck*"
+      approval: allow
+
+    - match: "pwd"
+      approval: allow
+
+    - match: "ls*"
+      approval: allow
+
+    - match: "*"
+      approval: prompt

@@ -1,70 +1,53 @@
 # Agent Delegation
 
-When delegating work, choose the appropriate execution level.
+Choose the lightest execution level appropriate for the task.
 
-## OMP native task subagent
+## OMP native task
 
-Use the native `task` tool for small, focused delegation such as:
+Use the native `task` tool for focused work that mainly returns information:
 
-- codebase exploration
-- finding files, symbols, and references
-- understanding existing implementation
-- research
-- code review
-- focused debugging
-- checking tests
-- comparing implementation approaches
+* codebase exploration and research
+* finding files, symbols, and references
+* code review and debugging
+* checking tests
+* comparing approaches
 
-Prefer native OMP subagents when the worker mainly needs to return
-information or a focused result to the parent agent.
-
-Do not open a separate Orca terminal for lightweight research.
+Do not create an Orca terminal for lightweight research.
 
 ## Orca terminal worker
 
-Use an independent Orca terminal worker when a task requires substantial
-independent implementation, such as:
+Use an independent Orca terminal for substantial implementation:
 
-- implementing a feature
-- modifying several related files
-- substantial refactoring
-- writing a significant test suite
-- migration work
-- an independent debug/fix/test cycle
+* features spanning related files
+* significant refactoring or tests
+* migrations
+* independent fix/test cycles
 
-A terminal worker should own a meaningful piece of work rather than
-a small research question.
-
-The worker may use OMP native task subagents internally.
+Workers may use OMP native subagents internally.
 
 ## Orca orchestration
 
-Use Orca orchestration when the overall request contains multiple
-substantial workstreams that can run independently or in parallel.
+Use Orca orchestration when multiple substantial workstreams can proceed independently or in parallel, such as frontend + backend + tests, large migrations, or multiple features/bugs.
 
-Examples:
+Hierarchy:
 
-- backend + frontend + tests
-- multiple independent features
-- large migrations
-- repository-wide changes
-- several substantial bugs
-- implementation + independent verification
+OMP native task → focused research/helper work
+Orca worker → substantial implementation
+Orca orchestration → multiple substantial workstreams
 
-Use Orca to coordinate these high-level workers.
+# Shell Execution
 
-## General rule
+For independent read-only/inspection commands likely to be auto-approved, prefer separate Bash calls rather than combining them with `&&`, `||`, `;`, pipes, or multiple commands.
 
-Use this hierarchy:
+Examples: `git status`, `git diff`, `git log`, `git show`, `ls`, `pwd`.
 
-small research/helper task
-→ OMP native task
+Prefer:
 
-substantial independent implementation
-→ Orca terminal worker
+`git -C apps/web status --short`
+`git status --short`
 
-multiple substantial coordinated implementations
-→ Orca orchestration
+over:
 
-Avoid creating unnecessary Orca terminals when an OMP native task
-would be sufficient.
+`git -C apps/web status --short && git status --short`
+
+Compound commands are fine when chaining is meaningful, such as build/test/setup workflows. Do not split commands unnecessarily.
