@@ -20,10 +20,10 @@ colorBlindMode: false
 images:
   blockImages: false
 
-skills:
-  includeSkills:
-    - ask
-    - commit-group
+# skills:
+#   includeSkills:
+#     - ask
+#     - commit-group
 
 tools:
   approvalMode: write
