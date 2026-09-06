@@ -4,135 +4,107 @@ modelRoles:
   plan: openai-codex/gpt-5.6-sol:high
   slow: openai-codex/gpt-5.6-sol:xhigh
   smol: openai-codex/gpt-5.4-mini:medium
-
 symbolPreset: nerd
-
 composer:
   shape: borderless
-
 theme:
   dark: dark-cosmos
   light: light-github
-
 setupVersion: 2
 colorBlindMode: false
-
 images:
   blockImages: false
-
-# skills:
-#   includeSkills:
-#     - ask
-#     - commit-group
-
 tools:
   approvalMode: write
   approval:
     read: allow
     edit: allow
     bash: prompt
-
 bash:
   patterns:
-    # Destructive commands
-    - match: "rm -rf *"
+    - match: rm -rf *
       approval: deny
-
-    # Git inspection
-    - match: "git status*"
+    - match: git status*
       approval: allow
-    - match: "git -C * status*"
+    - match: git -C * status*
       approval: allow
-    - match: "git diff*"
+    - match: git diff*
       approval: allow
-    - match: "git -C * diff*"
+    - match: git -C * diff*
       approval: allow
-    - match: "git log*"
+    - match: git log*
       approval: allow
-    - match: "git -C * log*"
+    - match: git -C * log*
       approval: allow
-    - match: "git show*"
+    - match: git show*
       approval: allow
-    - match: "git -C * show*"
+    - match: git -C * show*
       approval: allow
-    - match: "git branch*"
+    - match: git branch*
       approval: allow
-    - match: "git -C * branch*"
+    - match: git -C * branch*
       approval: allow
-    - match: "git rev-parse*"
+    - match: git rev-parse*
       approval: allow
-    - match: "git -C * rev-parse*"
+    - match: git -C * rev-parse*
       approval: allow
-    - match: "git submodule status*"
+    - match: git submodule status*
       approval: allow
-    - match: "git -C * submodule status*"
+    - match: git -C * submodule status*
       approval: allow
-
-    # pnpm verification
-    - match: "pnpm test*"
+    - match: pnpm test*
       approval: allow
-    - match: "pnpm run test*"
+    - match: pnpm run test*
       approval: allow
-    - match: "pnpm lint*"
+    - match: pnpm lint*
       approval: allow
-    - match: "pnpm run lint*"
+    - match: pnpm run lint*
       approval: allow
-    - match: "pnpm check*"
+    - match: pnpm check*
       approval: allow
-    - match: "pnpm run check*"
+    - match: pnpm run check*
       approval: allow
-    - match: "pnpm typecheck*"
+    - match: pnpm typecheck*
       approval: allow
-    - match: "pnpm run typecheck*"
+    - match: pnpm run typecheck*
       approval: allow
-
-    # bun verification
-    - match: "bun test*"
+    - match: bun test*
       approval: allow
-    - match: "bun lint*"
+    - match: bun lint*
       approval: allow
-    - match: "bun check*"
+    - match: bun check*
       approval: allow
-    - match: "bun run test*"
+    - match: bun run test*
       approval: allow
-    - match: "bun run lint*"
+    - match: bun run lint*
       approval: allow
-    - match: "bun run check*"
+    - match: bun run check*
       approval: allow
-    - match: "bun run typecheck*"
+    - match: bun run typecheck*
       approval: allow
-
-    # npm verification
-    - match: "npm test*"
+    - match: npm test*
       approval: allow
-    - match: "npm run test*"
+    - match: npm run test*
       approval: allow
-    - match: "npm run lint*"
+    - match: npm run lint*
       approval: allow
-    - match: "npm run check*"
+    - match: npm run check*
       approval: allow
-    - match: "npm run typecheck*"
+    - match: npm run typecheck*
       approval: allow
-
-    # Basic inspection
-    - match: "pwd"
+    - match: pwd
       approval: allow
-    - match: "ls*"
+    - match: ls*
       approval: allow
-
-    # Everything else asks
     - match: "*"
       approval: prompt
-
 defaultThinkingLevel: medium
-
 dev:
   autoqaConsent: granted
-
 extendedContext: false
-
 codexResets:
   autoRedeem: "yes"
-
 advisor:
   enabled: false
+statusLine:
+  compactThinkingLevel: false
