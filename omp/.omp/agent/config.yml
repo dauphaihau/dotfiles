@@ -1,5 +1,5 @@
 modelRoles:
-  default: openai-codex/gpt-5.5:medium
+  default: openai-codex/gpt-6-astra:medium
   advisor: openai-codex/gpt-5.6-sol:high
   plan: openai-codex/gpt-5.6-sol:high
   slow: openai-codex/gpt-5.6-sol:xhigh
@@ -15,11 +15,11 @@ colorBlindMode: false
 images:
   blockImages: false
 tools:
-  approvalMode: write
+  approvalMode: yolo
   approval:
     read: allow
     edit: allow
-    bash: prompt
+    bash: allow
 bash:
   patterns:
     - match: rm -rf *
@@ -96,8 +96,6 @@ bash:
       approval: allow
     - match: ls*
       approval: allow
-    - match: "*"
-      approval: prompt
 defaultThinkingLevel: medium
 dev:
   autoqaConsent: granted
