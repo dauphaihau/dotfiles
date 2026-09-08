@@ -38,3 +38,5 @@ advisor:
   enabled: false
 statusLine:
   compactThinkingLevel: false
+retry:
+  waitForUsageReset: true
