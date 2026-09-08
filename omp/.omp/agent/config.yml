@@ -33,7 +33,7 @@ dev:
   autoqaConsent: granted
 extendedContext: false
 codexResets:
-  autoRedeem: "yes"
+  autoRedeem: "no"
 advisor:
   enabled: false
 statusLine:
