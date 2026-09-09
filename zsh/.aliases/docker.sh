@@ -3,6 +3,7 @@ if command -v colima &>/dev/null; then
   alias drs='colima start'   # docker runtime start
   alias drsp='colima stop'   # docker runtime stop
   alias drst='colima status' # docker runtime status
+  alias drr='colima restart' # docker runtime restart                                              
 fi
 
 # Docker
