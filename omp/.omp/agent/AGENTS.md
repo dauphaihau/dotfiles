@@ -23,7 +23,7 @@ Use an independent Orca terminal for substantial implementation:
 * migrations
 * independent fix/test cycles
 
-Workers may use OMP native subagents internally.
+Use OMP as the default Orca terminal worker agent. Start workers through Orca with `--agent omp`; do not launch `omp` manually inside an already-created worker terminal. Use `codex`, `claude`, or another agent only when the user explicitly asks for that agent or OMP is unavailable for the target worktree/runtime.
 
 ## Orca orchestration
 

@@ -107,11 +107,12 @@ run_icon() {
         webstorm)   apply_icon "/Applications/Webstorm.app"                 "$SCRIPT_DIR/../custom-icons-app/webstorm.icns" ;;
         cursor)   apply_icon "/Applications/Cursor.app"                   "$SCRIPT_DIR/../custom-icons-app/cursor.icns" ;;
         steam)   apply_icon "/Applications/Steam.app"                   "$SCRIPT_DIR/../custom-icons-app/steam.icns" ;;
-        *)        echo "Unknown app: $1. Available: zalo whatsapp firefox wallper sigmaos chatgpt zed safari" ;;
+        orca)    apply_icon "/Applications/Orca.app"                    "$SCRIPT_DIR/../custom-icons-app/telegram-dark.icns" ;;
+        *)        echo "Unknown app: $1. Available: zalo whatsapp firefox wallper sigmaos chatgpt zed safari webstorm cursor steam orca" ;;
     esac
 }
 
-ALL_KEYS="zalo whatsapp firefox wallper sigmaos chatgpt zed safari"
+ALL_KEYS="zalo whatsapp firefox wallper sigmaos chatgpt zed safari webstorm cursor steam orca"
 
 if [[ $# -eq 0 ]]; then
     for key in $ALL_KEYS; do
