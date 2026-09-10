@@ -22,6 +22,61 @@ apply_icon() {
         echo "$(date): FAIL — $APP_PATH" >> "$LOG"
 }
 
+apply_orca_icon() {
+    local APP_PATH="/Applications/Orca.app"
+    local ICON_PATH="$SCRIPT_DIR/../custom-icons-app/telegram-dark.icns"
+    local BUNDLE_ICON_PATH="$APP_PATH/Contents/Resources/icon.icns"
+    local RESOURCE_DIR="$APP_PATH/Contents/Resources/app.asar.unpacked/resources"
+    local TEMP_DIR
+    local PNG_ICON_PATH
+    local PNG_TARGET_PATH
+    local PNG_ICON_PATHS=(
+        "$RESOURCE_DIR/icon.png"
+        "$RESOURCE_DIR/app-icons/orca-watercolor.png"
+        "$RESOURCE_DIR/app-icons/orca-blue.png"
+    )
+
+    apply_icon "$APP_PATH" "$ICON_PATH"
+
+    if [[ ! -d "$APP_PATH" || ! -f "$ICON_PATH" ]]; then
+        return
+    fi
+
+    # Orca loads these PNGs at startup and overrides the Dock/Finder icon.
+    for PNG_TARGET_PATH in "${PNG_ICON_PATHS[@]}"; do
+        if [[ ! -f "$PNG_TARGET_PATH" ]]; then
+            echo "$(date): FAIL — Orca runtime icon not found: $PNG_TARGET_PATH" >> "$LOG"
+            return 1
+        fi
+    done
+
+    TEMP_DIR="$(mktemp -d "${TMPDIR:-/tmp/}orca-icon.XXXXXX")" || return 1
+    PNG_ICON_PATH="$TEMP_DIR/icon.png"
+    if ! sips -s format png "$ICON_PATH" --out "$PNG_ICON_PATH" >/dev/null; then
+        rm -rf "$TEMP_DIR"
+        echo "$(date): FAIL — could not convert Orca icon to PNG" >> "$LOG"
+        return 1
+    fi
+
+    for PNG_TARGET_PATH in "${PNG_ICON_PATHS[@]}"; do
+        if ! cp "$PNG_ICON_PATH" "$PNG_TARGET_PATH"; then
+            rm -rf "$TEMP_DIR"
+            echo "$(date): FAIL — Orca runtime icon $PNG_TARGET_PATH" >> "$LOG"
+            return 1
+        fi
+        echo "$(date): OK — updated Orca runtime icon $PNG_TARGET_PATH" >> "$LOG"
+    done
+    rm -rf "$TEMP_DIR"
+
+    if cp "$ICON_PATH" "$BUNDLE_ICON_PATH"; then
+        touch "$APP_PATH"
+        echo "$(date): OK — updated Orca bundle icon $BUNDLE_ICON_PATH" >> "$LOG"
+    else
+        echo "$(date): FAIL — Orca bundle icon $BUNDLE_ICON_PATH" >> "$LOG"
+        return 1
+    fi
+}
+
 apply_chatgpt_icon() {
     local APP_PATH="/Applications/ChatGPT.app"
     local ICON_PATH="$SCRIPT_DIR/../custom-icons-app/dark-chat-gpt.icns"
@@ -107,7 +162,7 @@ run_icon() {
         webstorm)   apply_icon "/Applications/Webstorm.app"                 "$SCRIPT_DIR/../custom-icons-app/webstorm.icns" ;;
         cursor)   apply_icon "/Applications/Cursor.app"                   "$SCRIPT_DIR/../custom-icons-app/cursor.icns" ;;
         steam)   apply_icon "/Applications/Steam.app"                   "$SCRIPT_DIR/../custom-icons-app/steam.icns" ;;
-        orca)    apply_icon "/Applications/Orca.app"                    "$SCRIPT_DIR/../custom-icons-app/telegram-dark.icns" ;;
+        orca)    apply_orca_icon ;;
         *)        echo "Unknown app: $1. Available: zalo whatsapp firefox wallper sigmaos chatgpt zed safari webstorm cursor steam orca" ;;
     esac
 }
