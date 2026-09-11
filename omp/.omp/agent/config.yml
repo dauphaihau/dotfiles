@@ -42,10 +42,12 @@ advisor:
   enabled: false
 statusLine:
   compactThinkingLevel: false
+  transparent: false
 retry:
   waitForUsageReset: true
   fallbackChains:
     openai-codex/gpt-5.5:
+      - google/gemini-3.6-flash
       - openrouter/openrouter/free
   usageAwareFallback: false
 display:
