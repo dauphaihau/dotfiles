@@ -49,6 +49,7 @@ retry:
     openai-codex/gpt-5.5:
       - google/gemini-3.6-flash
       - openrouter/openrouter/free
+      - groq/openai/gpt-oss-120b
   usageAwareFallback: false
 display:
   showTokenUsage: true
