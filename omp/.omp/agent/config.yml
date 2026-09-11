@@ -44,3 +44,9 @@ statusLine:
   compactThinkingLevel: false
 retry:
   waitForUsageReset: true
+  fallbackChains:
+    openai-codex/gpt-5.5:
+      - openrouter/openrouter/free
+  usageAwareFallback: false
+display:
+  showTokenUsage: true
