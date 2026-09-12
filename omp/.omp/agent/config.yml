@@ -51,5 +51,6 @@ retry:
       - openrouter/openrouter/free
       - groq/openai/gpt-oss-120b
   usageAwareFallback: false
+  modelFallback: false
 display:
   showTokenUsage: true
