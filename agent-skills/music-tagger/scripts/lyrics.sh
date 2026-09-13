@@ -62,13 +62,13 @@ main() {
   local bad
   bad=$(proposal_bad_rows "$proposal")
   if [[ -n $bad ]]; then
-    print -u2 "lyrics.sh: malformed table row (need 7 cells): $bad"
+    print -u2 "lyrics.sh: malformed table row (need $PROPOSAL_CELLS cells): $bad"
     return 2
   fi
 
   local stage="$dir/.mtag-lyrics"
 
-  local line state file title artist lyrics verdict detail out slug src fdur json sel
+  local line state file title artist lyrics verdict detail out slug src fdur json sel qtitle qartist
   local matched=0 cached=0 ambiguous=0 none=0 errored=0
   local -a reply
 
@@ -111,7 +111,10 @@ main() {
       continue
     fi
 
-    slug=$(print -r -- "$artist - $title" | tr '[:upper:]' '[:lower:]' | tr -cs '[:alnum:]' '-' | sed 's/^-//; s/-$//')
+    qtitle=$(strip_cover_suffix "$title")
+    qartist=$(strip_origin_suffix "$artist")
+
+    slug=$(print -r -- "$qartist - $qtitle" | tr '[:upper:]' '[:lower:]' | tr -cs '[:alnum:]' '-' | sed 's/^-//; s/-$//')
     out="$stage/${slug}.txt"
 
     if (( ! force )) && [[ -s $out ]]; then
@@ -121,8 +124,8 @@ main() {
     fi
 
     if ! json=$(curl -sS --max-time 20 -A "$UA" -G \
-                  --data-urlencode "artist_name=$artist" \
-                  --data-urlencode "track_name=$title" \
+                  --data-urlencode "artist_name=$qartist" \
+                  --data-urlencode "track_name=$qtitle" \
                   "$API" 2>&1); then
       print -r -- "$(printf 'LYRICS\t%s\t-\terror\tlrclib request failed: %s' "$file" "${json//$'\n'/ }")"
       (( errored++ ))
@@ -135,8 +138,8 @@ main() {
     fi
 
     sel=$(print -r -- "$json" | jq -c \
-      --arg t "$(print -r -- "$title" | tr '[:upper:]' '[:lower:]' | tr -cd '[:alnum:]')" \
-      --arg a "$(print -r -- "$artist" | tr '[:upper:]' '[:lower:]' | tr -cd '[:alnum:]')" \
+      --arg t "$(print -r -- "$qtitle" | tr '[:upper:]' '[:lower:]' | tr -cd '[:alnum:]')" \
+      --arg a "$(print -r -- "$qartist" | tr '[:upper:]' '[:lower:]' | tr -cd '[:alnum:]')" \
       --argjson d "$fdur" '
       (. | length) as $raw
       | [ .[]

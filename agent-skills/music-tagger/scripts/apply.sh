@@ -9,28 +9,31 @@
 #
 #   - dir: /abs/path/to/folder
 #
-#   | STATUS | FILE | TITLE | ARTIST | LYRICS | CONF | NOTE |
-#   | --- | --- | --- | --- | --- | --- | --- |
-#   | OK | messy name.mp3 | Real Title | Real Artist | .mtag-lyrics/x.txt | high | dropped (Lyrics) |
+#   | STATUS | FILE | TITLE | ARTIST | LYRICS | IMAGE | CONF | NOTE |
+#   | --- | --- | --- | --- | --- | --- | --- | --- |
+#   | OK | messy name.mp3 | Real Title | Real Artist | - | covers/real-title.jpg | high | split |
 #
 #   STATUS      OK | SKIP | ASK | UNSUPPORTED   (only OK is applied)
 #   FILE        audio path relative to the 'dir:' header
 #   TITLE       new title, or '-' / empty to leave unchanged
 #   ARTIST      new artist, or '-' / empty to leave unchanged
-#   LYRICS      plain-text lyrics file to embed, relative to 'dir:' (absolute paths
-#               also work), or '-' / empty for no lyrics. Never inline lyric text:
-#               a table row cannot contain newlines.
+#   LYRICS      plain-text lyrics file to embed, relative to 'dir:' (absolute
+#               paths also work), or '-' / empty for no lyrics
+#   IMAGE       cover image supplied by the user, relative to 'dir:' (absolute
+#               also works), or '-' / empty for none. Always embedded as
+#               FRONT_COVER; one image per file.
 #   CONF, NOTE  informational only
 #
-# Every row must have exactly 7 cells. Cell padding is trimmed, so the table may
+# Every row must have exactly 8 cells. Cell padding is trimmed, so the table may
 # be aligned or not. A literal '|' inside a value shifts the cells, so such rows
-# must be written as ASK rather than OK.
+# must be written as ASK rather than OK. A ':' in an image path is rejected:
+# mtag builds "--add-image <path>:FRONT_COVER" and a colon would split it wrong.
 #
 # Tagging uses the user's `mtag` zsh function, which also renames to "<title>.mp3".
 # Rows where that rename would clobber an existing file, or would be a no-op,
-# fall back to `eyeD3 --title/--artist/--add-lyrics` so the filename is left alone.
-# Lyrics staged under the proposal folder's .mtag-lyrics/ are deleted after they
-# are embedded and verified; files outside that directory are never touched.
+# fall back to `eyeD3 --title/--artist/--add-lyrics/--add-image` so the filename
+# is left alone. Lyrics staged under the proposal folder's .mtag-lyrics/ are
+# deleted after they are embedded and verified; any other file is never touched.
 
 emulate -L zsh
 source "${0:A:h}/lib.zsh"
@@ -68,7 +71,7 @@ main() {
   local bad
   bad=$(proposal_bad_rows "$proposal")
   if [[ -n $bad ]]; then
-    print -u2 "apply.sh: malformed table row (need 7 cells): $bad"
+    print -u2 "apply.sh: malformed table row (need $PROPOSAL_CELLS cells): $bad"
     return 2
   fi
 
@@ -86,8 +89,9 @@ main() {
   print "# tagger: $( (( have_mtag )) && print mtag || print 'eyeD3 (mtag not found)' )"
 
   local stage="$dir/.mtag-lyrics"
-  local line state file title artist lyrics lpath sanitized mode action readpath target src
-  local got got_title got_artist got_lyrics renamed
+  local line state file title artist lyrics image ipath sanitized mode action readpath target src
+  local got got_title got_artist got_lyrics got_art had_art replaced
+  local ext
   local applied=0 skipped=0 failed=0 planned=0
   local -a reply tagargs
   local -a staged_clean=()
@@ -102,6 +106,7 @@ main() {
     title=$(trim "${reply[3]}")
     artist=$(trim "${reply[4]}")
     lyrics=$(trim "${reply[5]}")
+    image=$(trim "${reply[6]}")
 
     if [[ $state != OK ]]; then
       print -r -- "SKIP     $state  $file"
@@ -112,8 +117,9 @@ main() {
     [[ $title == '-' ]] && title=""
     [[ $artist == '-' ]] && artist=""
     [[ $lyrics == '-' ]] && lyrics=""
+    [[ $image == '-' ]] && image=""
 
-    if [[ -z $title && -z $artist && -z $lyrics ]]; then
+    if [[ -z $title && -z $artist && -z $lyrics && -z $image ]]; then
       print -u2 "ERROR    nothing to set: $file"
       (( failed++ ))
       continue
@@ -140,6 +146,30 @@ main() {
       fi
     fi
 
+    ipath=""
+    if [[ -n $image ]]; then
+      if [[ $image == *:* ]]; then
+        print -u2 "ERROR    image path must not contain ':': $image"
+        (( failed++ ))
+        continue
+      fi
+      if [[ $image == /* ]]; then
+        ipath=$image
+      else
+        ipath="$dir/$image"
+      fi
+      if [[ ! -f $ipath ]]; then
+        print -u2 "ERROR    image not found: $ipath"
+        (( failed++ ))
+        continue
+      fi
+      ext=${ipath:e:l}
+      case $ext in
+        jpg|jpeg|png|webp) ;;
+        *) print -u2 "ERROR    unsupported image type '.$ext': $ipath"; (( failed++ )); continue ;;
+      esac
+    fi
+
     sanitized=${title//\//-}
     mode=eyeD3
     readpath=$src
@@ -158,9 +188,16 @@ main() {
       fi
     elif (( have_mtag )); then
       mode=mtag
-      action="mtag  (lyrics only, no rename)"
+      action="mtag  (no rename)"
     else
       action="eyeD3 (no title, no rename)"
+    fi
+
+    had_art=0
+    if [[ -n $ipath ]]; then
+      had_art=$(ffprobe -v quiet -print_format json -show_streams -- "$src" 2>/dev/null \
+                | jq -r '[.streams[]? | select((.disposition // {}) | .attached_pic == 1)] | length' 2>/dev/null)
+      [[ -z $had_art ]] && had_art=0
     fi
 
     if (( execute )); then
@@ -169,25 +206,29 @@ main() {
         [[ -n $title ]] && tagargs+=(-t "$sanitized")
         [[ -n $artist ]] && tagargs+=(-a "$artist")
         [[ -n $lpath ]] && tagargs+=(-l "$lpath")
+        [[ -n $ipath ]] && tagargs+=(-i "$ipath")
         mtag "${tagargs[@]}" || { print -u2 "ERROR    mtag failed: $file"; (( failed++ )); continue }
       else
         tagargs=()
         [[ -n $title ]] && tagargs+=(--title "$sanitized")
         [[ -n $artist ]] && tagargs+=(--artist "$artist")
         [[ -n $lpath ]] && tagargs+=(--add-lyrics "$lpath")
+        [[ -n $ipath ]] && tagargs+=(--add-image "$ipath:FRONT_COVER")
         eyeD3 "${tagargs[@]}" -- "$src" >/dev/null || { print -u2 "ERROR    eyeD3 failed: $file"; (( failed++ )); continue }
       fi
 
-      got=$(ffprobe -v quiet -print_format json -show_format -- "$readpath" 2>/dev/null)
-      got=$(print -r -- "$got" | jq -r '{
-        title:   (.format.tags.title // ""),
-        artist:  (.format.tags.artist // ""),
-        lyrics:  ([ (.format.tags // {}) | to_entries[] | select(.key | startswith("lyrics")) ] | length)
-      } | "\(.title)\t\(.artist)\t\(.lyrics)"' 2>/dev/null)
+      got=$(ffprobe -v quiet -print_format json -show_format -show_streams -- "$readpath" 2>/dev/null \
+            | jq -r '{
+                title:  (.format.tags.title // ""),
+                artist: (.format.tags.artist // ""),
+                lyrics: ([ (.format.tags // {}) | to_entries[] | select(.key | startswith("lyrics")) ] | length),
+                art:    ([ .streams[]? | select((.disposition // {}) | .attached_pic == 1) ] | length)
+              } | "\(.title)\t\(.artist)\t\(.lyrics)\t\(.art)"' 2>/dev/null)
       reply=("${(@ps:\t:)got}")
       got_title=${reply[1]}
       got_artist=${reply[2]}
       got_lyrics=${reply[3]}
+      got_art=${reply[4]}
 
       if [[ -n $title && $got_title != $sanitized ]] || [[ -n $artist && $got_artist != $artist ]]; then
         print -u2 "ERROR    readback mismatch: $file -> title='$got_title' artist='$got_artist'"
@@ -199,16 +240,23 @@ main() {
         (( failed++ ))
         continue
       fi
+      if [[ -n $ipath && ${got_art:-0} -lt 1 ]]; then
+        print -u2 "ERROR    cover image not embedded: $file"
+        (( failed++ ))
+        continue
+      fi
       if [[ -n $lpath && $lpath == "$stage/"* ]]; then
         staged_clean+=("$lpath")
       fi
 
       renamed=""
       [[ $readpath != $src ]] && renamed="  =>  ${readpath:t}"
-      print -r -- "OK       $file$renamed   [title='${title:+$sanitized}' artist='$artist'${lpath:+ lyrics='$lyrics'}]"
+      replaced=""
+      (( had_art > 0 )) && [[ -n $ipath ]] && replaced=" (replaced existing cover)"
+      print -r -- "OK       $file$renamed   [title='${title:+$sanitized}' artist='$artist'${lpath:+ lyrics='$lyrics'}${ipath:+ image='$image'}$replaced]"
       (( applied++ ))
     else
-      print -r -- "WOULD    $file  ->  title='${title:+$sanitized}' artist='$artist'${lpath:+ lyrics='$lyrics'}   [$action]"
+      print -r -- "WOULD    $file  ->  title='${title:+$sanitized}' artist='$artist'${lpath:+ lyrics='$lyrics'}${ipath:+ image='$image'}   [$action]"
       (( planned++ ))
     fi
   done < "$proposal"
