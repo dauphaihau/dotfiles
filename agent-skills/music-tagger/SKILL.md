@@ -123,7 +123,15 @@ Run this for every accepted proposal. Skip it only when the user asked for tags 
 zsh <skill-dir>/scripts/lyrics.sh "<folder>/mtag-proposal.md"   # add --force to refetch staged files
 ```
 
-It queries LRCLIB per `OK` row (artist + title), keeps candidates within 3s of the file's own duration, prefers a normalized exact title match, writes the plain lyrics to `<folder>/.mtag-lyrics/<artist>-<title>.txt`, and prints one line per row. Cover markers are stripped before the query — `Someone You Loved (Laura Benanti cover)` / `Laura Benanti (Lewis Capaldi origin)` are looked up as `Someone You Loved` / `Laura Benanti`, and the staged filename uses the bare names too:
+It queries LRCLIB per `OK` row (artist + title), keeps candidates within 3s of the file's own duration, prefers a normalized exact title match, writes the plain lyrics to `<folder>/.mtag-lyrics/<artist>-<title>.txt`, and prints one line per row. Cover markers are stripped before the query — `Someone You Loved (Laura Benanti cover)` / `Laura Benanti (Lewis Capaldi origin)` are looked up as `Someone You Loved` / `Laura Benanti`, and the staged filename uses the bare names too.
+
+**Origin fallback.** When the performer's own lookup finds no match and the `ARTIST` cell carries an `origin`, the query is retried against the original artist — usually the only version LRCLIB has. The retry demands a normalized exact title plus a matching artist, applies **no duration gate** (a cover's length often differs a lot) and takes the closest duration; the detail line says `(via original <name>)`, e.g.
+
+```
+LYRICS	Someone You Loved - Laura Benanti.mp3	.mtag-lyrics/laura-benanti-someone-you-loved.txt	match	[20 raw, 20 any duration] Someone You Loved - Lewis Capaldi 186.0s, diff 0s (via original Lewis Capaldi)
+```
+
+If the closest exact-title candidate is more than 120s off the file, the fallback reports `ambiguous` instead of matching, so a clip or a radically different version is never silently given the original's lyrics:
 
 ```
 LYRICS <TAB> FILE <TAB> PATH|- <TAB> STATUS <TAB> DETAIL
@@ -197,8 +205,9 @@ Do not claim success for a row that reported `ERROR`, and never describe lyrics 
 - **Cover markers live in the tag values.** With the requested shape, `ARTIST` is not a bare performer name — `Laura Benanti (Lewis Capaldi origin)` is what players, scrobblers, and library grouping will see and sort on. The skill strips the markers before lyric lookup; other tools will not. Prefer no decoration when the user hasn't asked for it, and never invent an `origin` to fill the pattern.
 - **Numbers never enter the table.** A positional `IMAGE` value would re-point every cover the moment a row is added, removed, reordered, or flipped to `SKIP`. Numbered input files are fine; `images.sh` resolves them to explicit paths once, and refuses to act at all when the counts disagree.
 - **Embedded art adds weight.** A 5MB JPEG is copied into every track it is attached to. Prefer ≤1000px and <1MB, and mention the size in `NOTE` when it is far over.
-- **Lyrics coverage is partial.** LRCLIB had 20 results for `Enrique Iglesias / Why Not Me` but **zero** for `Laura Benanti / Someone You Loved`, and a duration filter rejected a 30s clip of a 4-minute track. Covers, live versions, remixes, and non-mainstream catalogs routinely miss. `none` is a normal outcome, not a failure — say so and move on.
-- **Never fabricate lyrics.** No writing lyric text from memory, no matching on title alone, no picking the first search hit. Only a candidate within 3s of the file's duration and with a normalized exact title match is a `match`.
+- **The origin fallback can attach the original's text to a re-written cover.** Lyrics are normally identical across versions, but a cover with altered verses or added ad-libs will get the original's words. The `(via original …)` label plus the duration diff in DETAIL is the tell — read those lines before accepting, and blank the cell if a row looks wrong.
+- **Lyrics coverage is partial.** LRCLIB had 20 results for `Enrique Iglesias / Why Not Me` but **zero** for `Laura Benanti / Someone You Loved`, and a duration filter rejected a 30s clip of a 4-minute track. Covers, live versions, remixes, and non-mainstream catalogs routinely miss. `none` is a normal outcome, not a failure — say so and move on. The origin fallback rescues part of that gap, not all of it: it needs an `origin` marker to work from.
+- **Never fabricate lyrics.** No writing lyric text from memory, no picking the first search hit, no matching on title alone. A `match` requires a normalized exact title and either a duration within 3s of the file (performer lookup) or an exact artist plus the 120s guard (origin fallback).
 - **Synced lyrics are deliberately ignored.** LRCLIB returns LRC with timestamps, but USLT has no timing, so embedding LRC text would store literal `[00:12.34]` lines in the tag. Only `plainLyrics` is embedded.
 - **Lyrics staging is disposable.** `apply.sh` deletes `.mtag-lyrics/` files after a row embeds and verifies them, so an applied+renamed row cannot be re-applied without re-running `lyrics.sh` (one LRCLIB call, or `cached` if the file is still staged).
 - **Fetching is on by default.** Every accepted run makes one LRCLIB request per `OK` row, so tell the user up front (Phase 4) and skip the step when they ask for tags only. A run with no network still tags everything — lyrics just come back as per-row `error`.

@@ -76,8 +76,25 @@ strip_origin_suffix() {
   print -r -- "${head%[[:space:]]}"
 }
 
+# origin_artist <artist> -> "Lewis Capaldi" from "Laura Benanti (Lewis Capaldi origin)",
+# or nothing when there is no origin marker.
+origin_artist() {
+  local s=$1
+  [[ $s == *')' ]] || return 0
+  local body=${s%\)}
+  [[ $body == *'('* ]] || return 0
+  local tail=${body##*'('}
+  [[ ${tail:l} == origin ]] && return 0
+  [[ ${tail:l} == *[[:space:]]origin ]] || return 0
+  local inner=${tail[1,-7]}
+  inner=$(trim "$inner")
+  [[ -n $inner ]] && print -r -- "$inner"
+  return 0
+}
+
 # proposal_bad_rows <proposal>: print rows that look like table rows but do not
-# have 7 cells, so callers can fail loudly instead of misreading a hand edit.
+# have PROPOSAL_CELLS cells, so callers can fail loudly instead of misreading a
+# hand edit.
 proposal_bad_rows() {
   local line t
   local -a reply

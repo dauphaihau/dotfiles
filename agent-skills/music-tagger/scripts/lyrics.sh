@@ -18,15 +18,92 @@
 #   error      network/IO failure for that row
 #
 # Nothing is written into the proposal: the caller patches the LYRICS cells.
+#
 # Matching: same artist (normalized substring) and duration within 3s of the file,
-# preferring a normalized exact title match. Synced lyrics are ignored on purpose --
-# USLT has no timing, so embedding LRC text would store literal timestamps.
+# preferring a normalized exact title match. When that finds nothing and the ARTIST
+# cell carries an origin marker -- "Laura Benanti (Lewis Capaldi origin)" -- the
+# lookup is retried against the original artist. Lyrics are identical for a cover,
+# and the original's entry is usually the only one LRCLIB has. The retry requires an
+# exact normalized title and exact-enough artist, but no duration gate: a cover's
+# length can differ a lot, so the closest duration simply wins. Such a result is
+# labelled "(via original <name>)" in DETAIL.
+#
+# Synced lyrics are ignored on purpose -- USLT has no timing, so embedding LRC text
+# would store literal timestamps.
 
 emulate -L zsh
 source "${0:A:h}/lib.zsh"
 
 UA='music-tagger/0.1 (personal use)'
 API='https://lrclib.net/api/search'
+TOL_PERFORMER=3
+TOL_ORIGIN=0   # 0 = no duration gate
+
+norm() { print -r -- "$1" | tr '[:upper:]' '[:lower:]' | tr -cd '[:alnum:]' }
+
+# lrclib_search <artist> <title> -> JSON array on stdout; prints raw text and
+# returns non-zero on network/transport failure. One retry, after a short pause,
+# when LRCLIB answers 503 / ServerOverloaded -- observed in practice under bursts.
+lrclib_search() {
+  local a=$1 t=$2 out attempt=1
+  while :; do
+    if out=$(curl -sS --max-time 20 -A "$UA" -G \
+               --data-urlencode "artist_name=$a" \
+               --data-urlencode "track_name=$t" \
+               "$API" 2>&1) \
+       && print -r -- "$out" | jq -e 'type == "array"' >/dev/null 2>&1; then
+      print -r -- "$out"
+      return 0
+    fi
+    if (( attempt < 2 )) && [[ $out == *503* || $out == *ServerOverloaded* ]]; then
+      attempt=$(( attempt + 1 ))
+      sleep 2
+      continue
+    fi
+    print -r -- "$out"
+    return 1
+  done
+}
+
+# lrclib_match <json> <title> <artist> <duration> <tolerance>
+# -> one JSON object: {status, plain, detail}
+lrclib_match() {
+  local json=$1 t=$2 a=$3 d=$4 tol=$5
+  print -r -- "$json" | jq -c \
+    --arg t "$(norm "$t")" \
+    --arg a "$(norm "$a")" \
+    --argjson d "$d" \
+    --argjson tol "$tol" '
+    (. | length) as $raw
+    | [ .[]
+        | select((.instrumental // false) == false)
+        | select(.plainLyrics != null and (.plainLyrics | length) > 0)
+        | select(.duration != null)
+        | select($tol == 0 or ((.duration - $d) * (.duration - $d)) <= ($tol * $tol))
+        | select(((.artistName // "") | ascii_downcase | gsub("[^a-z0-9]"; "")) | contains($a))
+      ] as $cands
+    | ($cands | map(. + {tn: ((.trackName // "") | ascii_downcase | gsub("[^a-z0-9]"; ""))})) as $normed
+    | ($normed | map(select(.tn == $t))) as $exact
+    | (if $tol > 0 then "within \($tol)s" else "any duration" end) as $scope
+    | if ($exact | length) > 0 then
+        ($exact | sort_by((.duration - $d) * (.duration - $d)) | .[0]) as $b
+        | ($b.duration - $d | if . < 0 then -. else . end) as $dd
+        | if ($tol == 0 and $dd > 120) then
+            {status: "ambiguous", plain: null,
+             detail: "closest exact-title candidate is \((($dd * 100) | round) / 100)s off the file duration: \($b.trackName) - \($b.artistName) \($b.duration)s (\($raw) raw) -- check the version before using it"}
+          else
+            {status: "match", plain: $b.plainLyrics,
+             detail: "[\($raw) raw, \($cands | length) \($scope)] \($b.trackName) - \($b.artistName) \($b.duration)s, diff \((($dd * 100) | round) / 100)s"}
+          end
+      elif ($cands | length) > 0 then
+        {status: "ambiguous", plain: null,
+         detail: "\($cands | length) candidate(s) matched artist and duration but none exactly matched the title (\($raw) raw)"}
+      else
+        {status: "none", plain: null,
+         detail: "no candidate \($scope) of the file duration (\($raw) raw)"}
+      end
+  ' 2>/dev/null
+}
 
 main() {
   setopt pipe_fail
@@ -68,7 +145,7 @@ main() {
 
   local stage="$dir/.mtag-lyrics"
 
-  local line state file title artist lyrics verdict detail out slug src fdur json sel qtitle qartist
+  local line state file title artist lyrics verdict detail out slug src fdur json sel qtitle qartist origin verdict2 detail2
   local matched=0 cached=0 ambiguous=0 none=0 errored=0
   local -a reply
 
@@ -123,48 +200,13 @@ main() {
       continue
     fi
 
-    if ! json=$(curl -sS --max-time 20 -A "$UA" -G \
-                  --data-urlencode "artist_name=$qartist" \
-                  --data-urlencode "track_name=$qtitle" \
-                  "$API" 2>&1); then
+    if ! json=$(lrclib_search "$qartist" "$qtitle"); then
       print -r -- "$(printf 'LYRICS\t%s\t-\terror\tlrclib request failed: %s' "$file" "${json//$'\n'/ }")"
       (( errored++ ))
       continue
     fi
-    if ! print -r -- "$json" | jq -e 'type == "array"' >/dev/null 2>&1; then
-      print -r -- "$(printf 'LYRICS\t%s\t-\terror\tlrclib returned no result array' "$file")"
-      (( errored++ ))
-      continue
-    fi
 
-    sel=$(print -r -- "$json" | jq -c \
-      --arg t "$(print -r -- "$qtitle" | tr '[:upper:]' '[:lower:]' | tr -cd '[:alnum:]')" \
-      --arg a "$(print -r -- "$qartist" | tr '[:upper:]' '[:lower:]' | tr -cd '[:alnum:]')" \
-      --argjson d "$fdur" '
-      (. | length) as $raw
-      | [ .[]
-          | select((.instrumental // false) == false)
-          | select(.plainLyrics != null and (.plainLyrics | length) > 0)
-          | select(.duration != null)
-          | select(((.duration - $d) * (.duration - $d)) <= 9)
-          | select(((.artistName // "") | ascii_downcase | gsub("[^a-z0-9]"; "")) | contains($a))
-        ] as $cands
-      | ($cands | map(. + {tn: ((.trackName // "") | ascii_downcase | gsub("[^a-z0-9]"; ""))})) as $norm
-      | ($norm | map(select(.tn == $t))) as $exact
-      | if ($exact | length) > 0 then
-          ($exact | sort_by((.duration - $d) * (.duration - $d)) | .[0]) as $b
-          | ($b.duration - $d | if . < 0 then -. else . end) as $dd
-          | {status: "match", plain: $b.plainLyrics,
-             detail: "[\($raw) raw, \($cands | length) within 3s] \($b.trackName) - \($b.artistName) \($b.duration)s, diff \((($dd * 100) | round) / 100)s"}
-        elif ($cands | length) > 0 then
-          {status: "ambiguous", plain: null,
-           detail: "\($cands | length) candidate(s) matched artist and duration but none exactly matched the title (\($raw) raw)"}
-        else
-          {status: "none", plain: null,
-           detail: "no candidate within 3s of the file duration (\($raw) raw)"}
-        end
-    ' 2>/dev/null)
-
+    sel=$(lrclib_match "$json" "$qtitle" "$qartist" "$fdur" "$TOL_PERFORMER")
     if [[ -z $sel ]]; then
       print -r -- "$(printf 'LYRICS\t%s\t-\terror\tcould not parse lrclib response' "$file")"
       (( errored++ ))
@@ -173,6 +215,32 @@ main() {
 
     verdict=$(print -r -- "$sel" | jq -r '.status')
     detail=$(print -r -- "$sel" | jq -r '.detail')
+
+    if [[ $verdict != match ]]; then
+      origin=$(origin_artist "$artist")
+      if [[ -n $origin ]]; then
+        if json=$(lrclib_search "$origin" "$qtitle"); then
+          sel2=$(lrclib_match "$json" "$qtitle" "$origin" "$fdur" "$TOL_ORIGIN")
+          if [[ -n $sel2 ]]; then
+            verdict2=$(print -r -- "$sel2" | jq -r '.status')
+            detail2=$(print -r -- "$sel2" | jq -r '.detail')
+            if [[ $verdict2 == match ]]; then
+              sel=$sel2
+              verdict=$verdict2
+              detail="$detail2 (via original $origin)"
+            elif [[ $verdict2 == ambiguous ]]; then
+              sel=$sel2
+              verdict=$verdict2
+              detail="$detail2 (via original $origin)"
+            else
+              detail="$detail (origin $origin: no exact title match)"
+            fi
+          fi
+        else
+          detail="$detail (origin lookup failed)"
+        fi
+      fi
+    fi
 
     case $verdict in
       match)
