@@ -18,9 +18,9 @@ Skill directory (from the load header, also addressable as `skill://music-tagger
 zsh <skill-dir>/scripts/scan.sh "<folder>"
 ```
 
-Add `--recursive` only if the user wants subfolders included. Scan output is TSV — that is `scan.sh`'s own machine format, not the proposal; only the proposal is Markdown. Columns are `FILE EXT TITLE ARTIST DURATION SIZE`, with `FILE` relative to the `# dir:` line.
+Add `--recursive` only if the user wants subfolders included. Scan output is TSV — that is `scan.sh`'s own machine format, not the proposal; only the proposal is Markdown. Columns are `FILE EXT TITLE ARTIST DURATION SIZE`, with `FILE` relative to the `# dir:` line. The header also carries `# images: <n>` and one `# image: <relative path>` line per image file found (`jpg/jpeg/png/webp`) — those are the candidate covers for Phase 4b.
 
-If the folder yields zero files, say so and stop.
+If the folder yields zero audio files, say so and stop.
 
 ## Phase 2 — Analyze each row
 
@@ -58,7 +58,7 @@ Hard rules:
 - **Never invent metadata.** No guessed album names, no "the artist is probably X". If the split is not defensible, emit `ASK` with `?` and let the user fill it in.
 - Never emit tag fields outside title and artist. The `mtag` function has no album, track, genre, or year support. (`LYRICS` and `IMAGE` are file paths, not tag fields — see Phase 3.)
 - `-` means "leave this field unchanged". Never use `-` as a literal value.
-- If a file already has both title and artist, use `SKIP` unless the user explicitly asked to overwrite.
+- If a file already has both title and artist **and there is nothing else to add** (no lyrics, no cover), use `SKIP`. If lyrics or a cover are still missing, keep the row `OK` and put `-` in `TITLE`/`ARTIST` so the remaining columns can be applied without rewriting tags that are already correct.
 
 ## Phase 3 — Write the proposal
 
@@ -142,22 +142,37 @@ LYRICS <TAB> FILE <TAB> PATH|- <TAB> STATUS <TAB> DETAIL
 
 Patch only the `LYRICS` cells — the column is 5th. Do not reorder, rewrap, or re-align other cells, and never paste lyric text into the table. Repeat the `MATCH`/`cached` paths and the notable `DETAIL` lines when you report at the stop, so the user can catch a wrong match — especially a `(via original …)` one — before anything is written.
 
-### 4b. Covers — only when the user supplied images
+### 4b. Covers — from images you actually have
 
-Never fetch, download, or generate a cover. If the user handed you images — a folder, a dump of numbered files, a few paths — map them into the `IMAGE` cells. Use `images.sh` when the mapping is positional, since it is strict and reviewable:
+Never fetch, download, or generate a cover. Work only from image files that scan reported (`# image: …`) or that the user handed you.
+
+**Auto-fill rule.** If the number of available images equals the number of `OK` rows whose `IMAGE` cell is empty or `-`, map them positionally — that match is the evidence they belong together:
 
 ```bash
 zsh <skill-dir>/scripts/images.sh "<folder>/mtag-proposal.md" "<image-dir>"         # dry run: prints the mapping
 zsh <skill-dir>/scripts/images.sh "<folder>/mtag-proposal.md" "<image-dir>" --yes   # writes the paths into the table
 ```
 
-- Ordering: names that are entirely digits sort first, numerically (`1.jpg, 2.jpg, … 10.jpg`); everything else sorts after them lexicographically.
-- Targets: the `OK` rows whose `IMAGE` cell is empty or `-`, in table order. `ASK`/`SKIP` rows are never filled.
-- The image count must equal the target count. A mismatch is an error listing both sides — report it and ask, never pad, drop, or guess.
-- It writes explicit paths (relative when the images live inside the folder, absolute otherwise). A number is never stored in the table, so later row edits cannot silently re-point a cover.
-- Show the printed mapping at the stop so it is reviewed with everything else.
+Use the folder itself as `<image-dir>` when the images sit beside the audio. Ordering: names that are entirely digits sort first, numerically (`1.jpg, 2.jpg, … 10.jpg`); everything else sorts after them lexicographically.
 
-If the user's images are named after the tracks instead, fill the `IMAGE` cells yourself by name — same rules, still one explicit path per row.
+**Positional means position *now*.** The pairing is numeric-image order against the current row order, so it is only as stable as the listing it was taken from. A previous run that renamed files to `<title>.mp3` re-sorts the folder alphabetically and can invert a numbering you prepared earlier — a real case: images numbered `1.png, 2.png` against `Enrique Iglesias - Why Not Me…mp3` / `Someone You Loved - Laura Benanti.mp3`, then the files renamed to `Someone You Loved.mp3` / `Why Not Me.mp3`, which reverses the anchor. Therefore:
+
+- Always state the anchor in the stop report — `1.png → Why Not Me.mp3` — never just "covers mapped".
+- When a cover carries readable artist/title text, trust the artwork over the position and correct the mapping (including filling cells by hand).
+- When the mapping cannot be checked from the images themselves, say which part is positional and let the user confirm before applying.
+
+**Counts do not match → do not guess.** Report what you found and ask. Three cases:
+
+- More images than rows: they may be extras, or the mapping may be by name — ask, or fill cells yourself when the names clearly match the tracks.
+- Fewer images than rows: it may be one shared cover (`cover.jpg` for the whole folder). That is the user's call, not yours — they write the same path into several cells, or tell you which image goes where.
+- No images at all: leave every `IMAGE` cell as `-`. Never attach something speculative.
+
+Other rules:
+
+- `ASK`/`SKIP` rows are never filled, and rows that already have an `IMAGE` path are left alone.
+- Paths are written relative when the image lives inside the folder, absolute otherwise. A number is never stored in the table, so later row edits cannot silently re-point a cover.
+- One image per file, always `FRONT_COVER`; attaching over an existing cover replaces it and the run says so. `jpg/jpeg/png/webp` only, and no `:` anywhere in the path.
+- Show the mapping at the stop so it is reviewed with everything else.
 
 ## Phase 5 — Stop for review
 

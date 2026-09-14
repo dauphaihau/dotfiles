@@ -43,15 +43,17 @@ main() {
   local f ext rel row title artist dur size secs size_bytes
   local -a parts
   local -a out=()
+  local -a imgs=()
 
   for f in "${files[@]}"; do
     ext=${f:e:l}
+    rel=${f#$dir/}
     case $ext in
       mp3|flac|m4a|aac|wav|ogg|opus|aiff) ;;
+      jpg|jpeg|png|webp) imgs+=("$rel"); continue ;;
       *) continue ;;
     esac
 
-    rel=${f#$dir/}
     row=$(ffprobe -v quiet -print_format json -show_format -- "$f" 2>/dev/null \
           | jq -r '[.format.tags.title // "", .format.tags.artist // "", .format.duration // ""] | @tsv' 2>/dev/null)
 
@@ -80,6 +82,10 @@ main() {
   print "# dir: $dir"
   print "# columns: FILE<TAB>EXT<TAB>TITLE<TAB>ARTIST<TAB>DURATION<TAB>SIZE"
   print "# files: ${#out}"
+  print "# images: ${#imgs}"
+  for f in "${imgs[@]}"; do
+    print "# image: $f"
+  done
   print "#"
   for row in "${out[@]}"; do
     print -r -- "$row"
