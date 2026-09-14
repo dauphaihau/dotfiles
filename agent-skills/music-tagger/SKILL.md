@@ -6,7 +6,7 @@ allowed-tools: Read, Write, Glob, Bash(zsh:*), Bash(ffprobe:*), Bash(jq:*), Bash
 
 # Music Tagger
 
-Turn messy filenames into MP3 tags: scan → analyze → write a proposal → **stop** → apply only on explicit acceptance → verify. Lyrics are fetched and embedded by default; a tags-only run is the opt-out. Cover art is embedded only from image files the user supplies — never fetched.
+Turn messy filenames into MP3 tags: scan → analyze → propose → gather lyrics and covers → **stop** → apply only on explicit acceptance → verify. Lyrics are fetched and embedded by default; a tags-only run is the opt-out. Cover art is embedded only from image files the user supplies — never fetched.
 
 Tagging is done by the user's `mtag` zsh function. Do not invent a second tagger; `apply.sh` already sources and calls it.
 
@@ -29,7 +29,7 @@ Work from `FILE` plus whatever `TITLE`/`ARTIST` already exist. The goal is only 
 Strip noise from the basename:
 
 - bracketed suffixes: `[Official Audio]`, `(Lyrics)`, `(HD)`, `[MV]`, `(Official Video)`, `[4K]`
-- cover markers a previous run wrote: `(Laura Benanti cover)`, `(Lewis Capaldi origin)` — strip them and keep the bare song/performer when re-analyzing
+- cover markers a previous run wrote: `(Lewis Capaldi origin)` in an artist, and any `(... cover)` left in an older title — strip them and keep the bare song/performer when re-analyzing
 - quality/bitrate tokens: `320kbps`, `128 kbps`, `HQ`, `HD`, `FLAC`, `MP3`
 - separators and filler: `_`, `www.*` domains, ` - Topic`, yt-dlp video IDs (11-char `[A-Za-z0-9_-]` tail)
 
@@ -38,19 +38,20 @@ Decide which side is title and which is artist. `Artist - Title` is the yt-dlp c
 
 ### Covers
 
-When the recording is a cover, mark both fields — this is the requested shape:
+When the recording is a cover, mark the artist cell only — this is the requested shape:
 
 ```
-TITLE  = Someone You Loved (Laura Benanti cover)
+TITLE  = Someone You Loved
 ARTIST = Laura Benanti (Lewis Capaldi origin)
 ```
 
-- `TITLE` = `<song name> (<performer> cover)`; `ARTIST` = `<performer> (<original artist> origin)`.
-- Exactly that wording: lowercase `cover` and `origin` inside the parentheses, one space before each `(`, no padding inside the parentheses.
-- **Only when both are defensible.** The cover performer usually comes from the filename. The original artist is knowledge, not extraction — if you cannot identify it with confidence, do not invent one: leave both fields plain and say "cover, original artist unidentified" in `NOTE`. Never guess an original from a similar-sounding title.
-- Only for genuine covers. A remix, a live version, an acoustic take, or a different mix by the same artist is not a cover: use `(Live)`, `(Remix)`, `(Acoustic)` style markers only if you must, and never the `cover`/`origin` pair.
-- The markers are part of the tag values, so they end up in the filename too (`mtag` renames to `<title>.mp3`). That is intended.
-- `lyrics.sh` strips `(... cover)` and `(... origin)` before querying LRCLIB, and the analysis above strips them when re-reading a decorated filename — so the markers never break matching.
+- `TITLE` stays the plain song name — no marker, nothing that could read as a claim about the recording.
+- `ARTIST` = `<performer> (<original artist> origin)`: the performer you group by, plus whose song it originally is.
+- Exactly that wording: lowercase `origin` inside the parentheses, one space before `(`, no padding inside.
+- **Only when both are defensible.** The cover performer usually comes from the filename. The original artist is knowledge, not extraction — if you cannot identify it with confidence, do not invent one: leave `ARTIST` plain and say "cover, original artist unidentified" in `NOTE`. Never guess an original from a similar-sounding title.
+- Only for genuine covers. A remix, a live version, an acoustic take, or a different mix by the same artist is not a cover — never use the `origin` marker for those.
+- The marker is part of the tag value, so `ARTIST` is not a bare name for players, scrobblers, or grouping. Because `TITLE` is clean, the filename stays clean too (`mtag` renames to `<title>.mp3`).
+- `lyrics.sh` strips `(... origin)` before querying LRCLIB — and uses it as the fallback lookup key — while the analysis above strips it when re-reading an already-decorated artist, so the marker never breaks matching.
 
 Hard rules:
 
@@ -74,7 +75,7 @@ Write `<folder>/mtag-proposal.md` — a Markdown file the user reads and edits: 
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | OK | 01 - Song Name_[Official Audio]_320kbps.mp3 | Song Name | Real Artist | - | - | high | dropped [Official Audio], 320kbps |
 | OK | Real Artist - Track Name (HD).mp3 | Track Name | Real Artist | .mtag-lyrics/real-artist-track-name.txt | covers/track-name.jpg | high | artist-first split |
-| OK | Someone You Loved - Laura Benanti.mp3 | Someone You Loved (Laura Benanti cover) | Laura Benanti (Lewis Capaldi origin) | - | covers/benanti.jpg | medium | cover of Lewis Capaldi |
+| OK | Someone You Loved - Laura Benanti.mp3 | Someone You Loved | Laura Benanti (Lewis Capaldi origin) | - | covers/benanti.jpg | medium | cover of Lewis Capaldi |
 | ASK | unknown_1.mp3 | ? | ? | - | - | low | no separable title or artist |
 | SKIP | already-tagged.mp3 | - | - | - | - | - | has title and artist already |
 ```
@@ -84,7 +85,7 @@ Write `<folder>/mtag-proposal.md` — a Markdown file the user reads and edits: 
 - `SKIP` — deliberately left alone.
 - `UNSUPPORTED` — not an MP3 (see risks).
 
-`LYRICS` holds a **path** to a plain-text lyrics file — relative to the folder, absolute also accepted — or `-` for none. Lyric text is never written into the proposal: a Markdown table row cannot contain newlines, so inlining even one lyric would destroy the table. Write `-` when you create the proposal and leave the cell alone; Phase 5 fills it in.
+`LYRICS` holds a **path** to a plain-text lyrics file — relative to the folder, absolute also accepted — or `-` for none. Lyric text is never written into the proposal: a Markdown table row cannot contain newlines, so inlining even one lyric would destroy the table. Write `-` when you create the proposal and leave the cell alone; Phase 4 fills it in.
 
 `IMAGE` holds a **path** to a cover image the user supplied — relative to the folder, absolute also accepted — or `-` for none. Rules:
 
@@ -107,23 +108,19 @@ Copy `FILE` values verbatim from scan output. Never rename, reorder, or normaliz
 
 `mtag` renames the file to `<title>.mp3` in the same folder, so state the resulting filename for each `OK` row when you report.
 
-## Phase 4 — Stop
+## Phase 4 — Gather lyrics and covers (before the review)
 
-Print the proposal path, the per-status counts, and the list of `OK` rows with their resulting filenames. Say that lyrics will be fetched from LRCLIB on acceptance unless the user says no, and — if they handed you cover images — show which image goes to which row. Then stop and wait. Never run `mtag` or `apply.sh --yes` before the user accepts.
+Everything that can be attached is resolved **before** you stop, so the user reviews one complete table — titles, artists, lyrics, covers — in a single pass.
 
-The user accepts by editing the table in place and saying go. Re-read the file after acceptance; do not reuse values you had in memory.
+### 4a. Lyrics — always, unless the user opted out
 
-## Phase 5 — Apply
-
-### 5a. Lyrics — always, unless the user opted out
-
-Run this for every accepted proposal. Skip it only when the user asked for tags only (`--no-lyrics`, "no lyrics", "just tags").
+Run this for every proposal. Skip it only when the user asked for tags only (`--no-lyrics`, "no lyrics", "just tags").
 
 ```bash
 zsh <skill-dir>/scripts/lyrics.sh "<folder>/mtag-proposal.md"   # add --force to refetch staged files
 ```
 
-It queries LRCLIB per `OK` row (artist + title), keeps candidates within 3s of the file's own duration, prefers a normalized exact title match, writes the plain lyrics to `<folder>/.mtag-lyrics/<artist>-<title>.txt`, and prints one line per row. Cover markers are stripped before the query — `Someone You Loved (Laura Benanti cover)` / `Laura Benanti (Lewis Capaldi origin)` are looked up as `Someone You Loved` / `Laura Benanti`, and the staged filename uses the bare names too.
+It queries LRCLIB per `OK` row (artist + title), keeps candidates within 3s of the file's own duration, prefers a normalized exact title match, writes the plain lyrics to `<folder>/.mtag-lyrics/<artist>-<title>.txt`, and prints one line per row. An `origin` marker is stripped before the query — `Laura Benanti (Lewis Capaldi origin)` is looked up as `Laura Benanti`, and the staged filename uses the bare name.
 
 **Origin fallback.** When the performer's own lookup finds no match and the `ARTIST` cell carries an `origin`, the query is retried against the original artist — usually the only version LRCLIB has. The retry demands a normalized exact title plus a matching artist, applies **no duration gate** (a cover's length often differs a lot) and takes the closest duration; the detail line says `(via original <name>)`, e.g.
 
@@ -143,11 +140,9 @@ LYRICS <TAB> FILE <TAB> PATH|- <TAB> STATUS <TAB> DETAIL
 - `none` — leave `-`. This is normal for covers, live takes, and non-mainstream catalogs.
 - `error` — network or IO failure for that row; leave `-`, report it, and continue. Do not abort the whole run.
 
-Patch only the `LYRICS` cells — the column is 5th. Do not reorder, rewrap, or re-align other cells, and never paste lyric text into the table.
+Patch only the `LYRICS` cells — the column is 5th. Do not reorder, rewrap, or re-align other cells, and never paste lyric text into the table. Repeat the `MATCH`/`cached` paths and the notable `DETAIL` lines when you report at the stop, so the user can catch a wrong match — especially a `(via original …)` one — before anything is written.
 
-If any row came back `match`, show the match details (track, artist, duration, diff) and get one confirmation before embedding, so a wrong match is caught before it is written. If every row is `none`/`ambiguous`/`cached`, the table did not change and you can go straight on.
-
-### 5b. Covers — only when the user supplied images
+### 4b. Covers — only when the user supplied images
 
 Never fetch, download, or generate a cover. If the user handed you images — a folder, a dump of numbered files, a few paths — map them into the `IMAGE` cells. Use `images.sh` when the mapping is positional, since it is strict and reviewable:
 
@@ -160,13 +155,17 @@ zsh <skill-dir>/scripts/images.sh "<folder>/mtag-proposal.md" "<image-dir>" --ye
 - Targets: the `OK` rows whose `IMAGE` cell is empty or `-`, in table order. `ASK`/`SKIP` rows are never filled.
 - The image count must equal the target count. A mismatch is an error listing both sides — report it and ask, never pad, drop, or guess.
 - It writes explicit paths (relative when the images live inside the folder, absolute otherwise). A number is never stored in the table, so later row edits cannot silently re-point a cover.
-- Show the printed mapping to the user, and confirm it before applying if the count was anything other than an obvious 1:1 of files they just handed over.
+- Show the printed mapping at the stop so it is reviewed with everything else.
 
 If the user's images are named after the tracks instead, fill the `IMAGE` cells yourself by name — same rules, still one explicit path per row.
 
-### 5c. Tag
+## Phase 5 — Stop for review
 
-Dry run first, then execute after acceptance:
+Print the proposal path, the per-status counts, the list of `OK` rows with their resulting filenames, the lyrics outcome per row (`match`/`none`/`ambiguous`, including any `via original`), and the image mapping. Then stop and wait. Never run `mtag` or `apply.sh --yes` before the user accepts.
+
+This is the single gate: lyrics and covers are already in the table by now, so nothing else is fetched after acceptance. The user accepts by editing the table in place and saying go. Re-read the file after acceptance; do not reuse values you had in memory.
+
+## Phase 6 — Apply
 
 ```bash
 zsh <skill-dir>/scripts/apply.sh "<folder>/mtag-proposal.md"        # prints WOULD lines, writes nothing
@@ -182,7 +181,7 @@ zsh <skill-dir>/scripts/apply.sh "<folder>/mtag-proposal.md" --yes  # executes
 - only ever applies `OK` rows; `ASK`/`SKIP`/`UNSUPPORTED` are reported and left untouched
 - deletes staged `.mtag-lyrics/` files only after their row embedded and verified them, then removes the directory if it is empty. Files you point `LYRICS` or `IMAGE` at are never deleted.
 
-## Phase 6 — Verify and report
+## Phase 7 — Verify and report
 
 `apply.sh` re-reads every written file with `ffprobe` and fails a row when the title/artist does not match, when lyrics were requested but no `lyrics-*` tag exists, or when an image was requested but no attached-picture stream is present. Report from its output:
 
@@ -202,7 +201,7 @@ Do not claim success for a row that reported `ERROR`, and never describe lyrics 
 - **Malformed rows fail loudly.** A row without exactly eight cells is reported as `ERROR` and the run exits non-zero; it is never applied or silently skipped, so a hand-edited table cannot half-apply by accident.
 - **Cover art comes only from the user.** No web search, no download, no generated placeholder, no "that filename looks like an album so this artwork probably fits". Offer to fill the `IMAGE` column only from files the user supplied or pointed at, and mark anything you cannot map defensibly as `ASK`.
 - **One image, `FRONT_COVER`, replaced not accumulated.** Attaching a cover to a file that already has one overwrites the existing front cover (verified: still exactly one attached-picture stream). Say so when it happens. A `:` in the image path is a hard `ERROR`, because `mtag` builds `--add-image <path>:FRONT_COVER`.
-- **Cover markers live in the tag values.** With the requested shape, `ARTIST` is not a bare performer name — `Laura Benanti (Lewis Capaldi origin)` is what players, scrobblers, and library grouping will see and sort on. The skill strips the markers before lyric lookup; other tools will not. Prefer no decoration when the user hasn't asked for it, and never invent an `origin` to fill the pattern.
+- **The origin marker lives in `ARTIST`.** `Laura Benanti (Lewis Capaldi origin)` is what players, scrobblers, and library grouping see and sort on — the title stays clean, but the artist string is not a bare identity. The skill strips the marker for lyric lookup; other tools will not. Prefer no decoration when the user hasn't asked for it, and never invent an `origin` to fill the pattern.
 - **Numbers never enter the table.** A positional `IMAGE` value would re-point every cover the moment a row is added, removed, reordered, or flipped to `SKIP`. Numbered input files are fine; `images.sh` resolves them to explicit paths once, and refuses to act at all when the counts disagree.
 - **Embedded art adds weight.** A 5MB JPEG is copied into every track it is attached to. Prefer ≤1000px and <1MB, and mention the size in `NOTE` when it is far over.
 - **The origin fallback can attach the original's text to a re-written cover.** Lyrics are normally identical across versions, but a cover with altered verses or added ad-libs will get the original's words. The `(via original …)` label plus the duration diff in DETAIL is the tell — read those lines before accepting, and blank the cell if a row looks wrong.
@@ -210,7 +209,7 @@ Do not claim success for a row that reported `ERROR`, and never describe lyrics 
 - **Never fabricate lyrics.** No writing lyric text from memory, no picking the first search hit, no matching on title alone. A `match` requires a normalized exact title and either a duration within 3s of the file (performer lookup) or an exact artist plus the 120s guard (origin fallback).
 - **Synced lyrics are deliberately ignored.** LRCLIB returns LRC with timestamps, but USLT has no timing, so embedding LRC text would store literal `[00:12.34]` lines in the tag. Only `plainLyrics` is embedded.
 - **Lyrics staging is disposable.** `apply.sh` deletes `.mtag-lyrics/` files after a row embeds and verifies them, so an applied+renamed row cannot be re-applied without re-running `lyrics.sh` (one LRCLIB call, or `cached` if the file is still staged).
-- **Fetching is on by default.** Every accepted run makes one LRCLIB request per `OK` row, so tell the user up front (Phase 4) and skip the step when they ask for tags only. A run with no network still tags everything — lyrics just come back as per-row `error`.
+- **Fetching is on by default and happens before the review.** Every run makes one LRCLIB request per `OK` row, so the lyrics outcome is part of what the user reviews at the stop, not a surprise afterwards. Skip the step only when they ask for tags only. A run with no network still tags everything — lyrics just come back as per-row `error`.
 - **Network failure is row-local.** A `curl`/timeout error on one row reports `error` for that row; the other rows still fetch and apply. Never treat a failed fetch as a match, and never abort tagging because lyrics failed.
 - **Idempotence.** Re-running an applied proposal is safe but noisy: rows whose file was renamed away report `missing file`, rows already carrying the target name are tagged in place without a second rename. Never present a re-run as a fresh success.
 - **No rolling back.** Renames are plain `mv`; there is no undo. Keep the proposal file until the user has checked the result — it is the only record of the old→new mapping.

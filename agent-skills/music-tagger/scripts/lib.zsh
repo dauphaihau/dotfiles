@@ -47,22 +47,11 @@ proposal_row_is_data() {
 }
 
 # Cover convention (user's shape):
-#   TITLE  "Song Name (Cover Artist cover)"
+#   TITLE  "Song Name"                              -- plain, no marker
 #   ARTIST "Cover Artist (Original Artist origin)"
-# These helpers recover the bare identity for lookups that must not see the
-# markers (LRCLIB queries, staged filenames). Tag writes use the decorated values.
-
-# strip_cover_suffix <title> -> title without a trailing "(... cover)"
-strip_cover_suffix() {
-  local s=$1
-  [[ $s == *')' ]] || { print -r -- "$s"; return 0 }
-  local body=${s%\)}
-  [[ $body == *'('* ]] || { print -r -- "$s"; return 0 }
-  local tail=${body##*'('}
-  [[ ${tail:l} == *[[:space:]]cover || ${tail:l} == cover ]] || { print -r -- "$s"; return 0 }
-  local head=${body%'('*}
-  print -r -- "${head%[[:space:]]}"
-}
+# The title is a clean identity, so only the artist needs unwrapping for lookups
+# that must not see the marker (LRCLIB queries, staged filenames). Tag writes use
+# the decorated artist value as-is.
 
 # strip_origin_suffix <artist> -> artist without a trailing "(... origin)"
 strip_origin_suffix() {

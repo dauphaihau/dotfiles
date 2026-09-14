@@ -145,7 +145,7 @@ main() {
 
   local stage="$dir/.mtag-lyrics"
 
-  local line state file title artist lyrics verdict detail out slug src fdur json sel qtitle qartist origin verdict2 detail2
+  local line state file title artist lyrics verdict detail out slug src fdur json sel qartist origin verdict2 detail2
   local matched=0 cached=0 ambiguous=0 none=0 errored=0
   local -a reply
 
@@ -188,10 +188,9 @@ main() {
       continue
     fi
 
-    qtitle=$(strip_cover_suffix "$title")
     qartist=$(strip_origin_suffix "$artist")
 
-    slug=$(print -r -- "$qartist - $qtitle" | tr '[:upper:]' '[:lower:]' | tr -cs '[:alnum:]' '-' | sed 's/^-//; s/-$//')
+    slug=$(print -r -- "$qartist - $title" | tr '[:upper:]' '[:lower:]' | tr -cs '[:alnum:]' '-' | sed 's/^-//; s/-$//')
     out="$stage/${slug}.txt"
 
     if (( ! force )) && [[ -s $out ]]; then
@@ -200,13 +199,13 @@ main() {
       continue
     fi
 
-    if ! json=$(lrclib_search "$qartist" "$qtitle"); then
+    if ! json=$(lrclib_search "$qartist" "$title"); then
       print -r -- "$(printf 'LYRICS\t%s\t-\terror\tlrclib request failed: %s' "$file" "${json//$'\n'/ }")"
       (( errored++ ))
       continue
     fi
 
-    sel=$(lrclib_match "$json" "$qtitle" "$qartist" "$fdur" "$TOL_PERFORMER")
+    sel=$(lrclib_match "$json" "$title" "$qartist" "$fdur" "$TOL_PERFORMER")
     if [[ -z $sel ]]; then
       print -r -- "$(printf 'LYRICS\t%s\t-\terror\tcould not parse lrclib response' "$file")"
       (( errored++ ))
@@ -219,8 +218,8 @@ main() {
     if [[ $verdict != match ]]; then
       origin=$(origin_artist "$artist")
       if [[ -n $origin ]]; then
-        if json=$(lrclib_search "$origin" "$qtitle"); then
-          sel2=$(lrclib_match "$json" "$qtitle" "$origin" "$fdur" "$TOL_ORIGIN")
+        if json=$(lrclib_search "$origin" "$title"); then
+          sel2=$(lrclib_match "$json" "$title" "$origin" "$fdur" "$TOL_ORIGIN")
           if [[ -n $sel2 ]]; then
             verdict2=$(print -r -- "$sel2" | jq -r '.status')
             detail2=$(print -r -- "$sel2" | jq -r '.detail')
