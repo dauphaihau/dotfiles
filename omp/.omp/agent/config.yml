@@ -5,7 +5,7 @@ modelRoles:
   slow: openai-codex/gpt-6-astra:low
   smol: opencode-go/deepseek-v4.1-flash:low
   task: opencode-go/kimi-k2.7-code:medium
-  architect: openai-codex/gpt-6-astra:low
+  architect: openai-codex/gpt-5.6-terra:low
 task:
   agentModelOverrides:
     task: "@task"
