@@ -1,8 +1,7 @@
 modelRoles:
   default: opencode-go/deepseek-v4.1-flash
   advisor: openai-codex/gpt-6-astra:high
-  plan: openai-codex/gpt-6-astra:low
-  slow: openai-codex/gpt-6-astra:low
+  slow: openai-codex/gpt-5.6-terra:medium
   smol: opencode-go/deepseek-v4.1-flash:low
   task: opencode-go/kimi-k2.7-code:medium
   architect: openai-codex/gpt-5.6-terra:low
@@ -51,10 +50,13 @@ retry:
       - google/gemini-3.6-flash
       - openrouter/openrouter/free
       - groq/openai/gpt-oss-120b
+    opencode-go/kimi-k2.7-code:
+      - openai-codex/gpt-5.6-sol:low
+    opencode-go/deepseek-v4.1-flash:
+      - openai-codex/gpt-5.6-sol:medium
   usageAwareFallback: false
-  modelFallback: false
+  modelFallback: true
 display:
   showTokenUsage: true
 cycleOrder:
-  - smol
-  - default
+  []
