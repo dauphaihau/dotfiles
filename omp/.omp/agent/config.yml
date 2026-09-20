@@ -1,5 +1,5 @@
 modelRoles:
-  default: opencode-go/deepseek-v4.1-flash
+  default: opencode-go/deepseek-v4.1-flash:low
   advisor: openai-codex/gpt-6-astra:high
   slow: openai-codex/gpt-5.6-terra:medium
   smol: opencode-go/deepseek-v4.1-flash:low
