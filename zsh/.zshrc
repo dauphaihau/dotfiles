@@ -1,6 +1,5 @@
-# Fig pre block. Keep at the top of this file.
-[[ -f "$HOME/.fig/shell/zshrc.pre.zsh" ]] && builtin source "$HOME/.fig/shell/zshrc.pre.zsh"
-
+# Q pre block. Keep at the top of this file.
+[[ -f "${HOME}/Library/Application Support/amazon-q/shell/zshrc.pre.zsh" ]] && builtin source "${HOME}/Library/Application Support/amazon-q/shell/zshrc.pre.zsh"
 # Centralized exports
 source ~/.exports
 source ~/.colors
@@ -29,9 +28,6 @@ eval "$(starship init zsh)"
 # Keep Volta shims ahead of any Node version manager PATH changes.
 export VOLTA_HOME="$HOME/.volta"
 export PATH="$VOLTA_HOME/bin:$PATH"
-
-# Fig post block. Keep at the bottom of this file.
-[[ -f "$HOME/.fig/shell/zshrc.post.zsh" ]] && builtin source "$HOME/.fig/shell/zshrc.post.zsh"
 
 # bun completions
 [ -s "/Users/dauphaihau/.bun/_bun" ] && source "/Users/dauphaihau/.bun/_bun"
@@ -86,3 +82,6 @@ devcopy() {
 
   wait "$dev_pid"
 }
+
+# Q post block. Keep at the bottom of this file.
+[[ -f "${HOME}/Library/Application Support/amazon-q/shell/zshrc.post.zsh" ]] && builtin source "${HOME}/Library/Application Support/amazon-q/shell/zshrc.post.zsh"
