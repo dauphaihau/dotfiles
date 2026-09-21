@@ -6,6 +6,7 @@ modelRoles:
   task: opencode-go/kimi-k2.7-code:medium
   architect: openai-codex/gpt-5.6-sol:medium
   architecture-2: openai-codex/gpt-6-astra:low
+  architecture-3: opencode-go/glm-5.3-flash:high
 task:
   agentModelOverrides:
     task: "@task"
