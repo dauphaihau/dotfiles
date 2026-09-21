@@ -131,6 +131,66 @@ apply_chatgpt_icon() {
     touch "$APP_PATH"
 }
 
+apply_warp_icon() {
+    local APP_PATH="/Applications/Warp.app"
+    local ICON_PATH="$SCRIPT_DIR/../custom-icons-app/warp-2.icns"
+    local INFO_PLIST="$APP_PATH/Contents/Info.plist"
+    local BUNDLE_ICON_PATH="$APP_PATH/Contents/Resources/AppIcon.icns"
+    # Warp ships an NSDockTilePlugIn that repaints the Dock icon from its own PNGs,
+    # so the bundle icon alone is ignored while the app runs.
+    local DOCK_TILE_RESOURCES="$APP_PATH/Contents/PlugIns/WarpDockTilePlugin.docktileplugin/Contents/Resources"
+    local TEMP_DIR
+    local PNG_ICON_PATH
+    local PNG_TARGET_PATH
+
+    apply_icon "$APP_PATH" "$ICON_PATH"
+
+    if [[ ! -d "$APP_PATH" || ! -f "$ICON_PATH" ]]; then
+        return
+    fi
+
+    if cp "$ICON_PATH" "$BUNDLE_ICON_PATH"; then
+        echo "$(date): OK — updated Warp bundle icon $BUNDLE_ICON_PATH" >> "$LOG"
+    else
+        echo "$(date): FAIL — Warp bundle icon $BUNDLE_ICON_PATH" >> "$LOG"
+        return 1
+    fi
+
+    # Assets.car carries an AppIcon entry that wins over CFBundleIconFile.
+    if [[ -f "$INFO_PLIST" ]]; then
+        /usr/libexec/PlistBuddy -c "Delete :CFBundleIconName" "$INFO_PLIST" 2>/dev/null || true
+        echo "$(date): OK — configured Warp to use CFBundleIconFile" >> "$LOG"
+    fi
+
+    if [[ ! -d "$DOCK_TILE_RESOURCES" ]]; then
+        echo "$(date): SKIP — Warp dock tile plugin not found: $DOCK_TILE_RESOURCES" >> "$LOG"
+        touch "$APP_PATH"
+        return
+    fi
+
+    TEMP_DIR="$(mktemp -d "${TMPDIR:-/tmp/}warp-icon.XXXXXX")" || return 1
+    PNG_ICON_PATH="$TEMP_DIR/icon.png"
+    if ! sips -s format png "$ICON_PATH" --out "$PNG_ICON_PATH" >/dev/null; then
+        rm -rf "$TEMP_DIR"
+        echo "$(date): FAIL — could not convert Warp icon to PNG" >> "$LOG"
+        return 1
+    fi
+
+    # The plugin resolves the "appearance.icon.app_icon" setting to one of these PNGs
+    # (aurora, original, warpone -> warp_2, ...); "default" falls back to the bundle
+    # icon. Replace every one of them so the Dock shows this icon in all cases.
+    for PNG_TARGET_PATH in "$DOCK_TILE_RESOURCES"/*.png; do
+        if cp "$PNG_ICON_PATH" "$PNG_TARGET_PATH"; then
+            echo "$(date): OK — updated Warp dock tile icon $PNG_TARGET_PATH" >> "$LOG"
+        else
+            echo "$(date): FAIL — Warp dock tile icon $PNG_TARGET_PATH" >> "$LOG"
+        fi
+    done
+    rm -rf "$TEMP_DIR"
+
+    touch "$APP_PATH"
+}
+
 refresh_icon_caches() {
     local USER_CACHE_DIR
 
@@ -163,11 +223,12 @@ run_icon() {
         cursor)   apply_icon "/Applications/Cursor.app"                   "$SCRIPT_DIR/../custom-icons-app/cursor.icns" ;;
         steam)   apply_icon "/Applications/Steam.app"                   "$SCRIPT_DIR/../custom-icons-app/steam.icns" ;;
         orca)    apply_orca_icon ;;
-        *)        echo "Unknown app: $1. Available: zalo whatsapp firefox wallper sigmaos chatgpt zed safari webstorm cursor steam orca" ;;
+        warp)    apply_warp_icon ;;
+        *)        echo "Unknown app: $1. Available: zalo whatsapp firefox wallper sigmaos chatgpt zed safari webstorm cursor steam orca warp" ;;
     esac
 }
 
-ALL_KEYS="zalo whatsapp firefox wallper sigmaos chatgpt zed safari webstorm cursor steam orca"
+ALL_KEYS="zalo whatsapp firefox wallper sigmaos chatgpt zed safari webstorm cursor steam orca warp"
 
 if [[ $# -eq 0 ]]; then
     for key in $ALL_KEYS; do
