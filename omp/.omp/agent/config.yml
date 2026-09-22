@@ -7,6 +7,7 @@ modelRoles:
   architect: openai-codex/gpt-5.6-sol:medium
   architecture-2: openai-codex/gpt-6-astra:low
   architecture-3: opencode-go/glm-5.3-flash:high
+  architecture-4: opencode-go/deepseek-v4.1-flash:high
 task:
   agentModelOverrides:
     task: "@task"
