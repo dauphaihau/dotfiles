@@ -80,7 +80,6 @@ apply_orca_icon() {
 apply_chatgpt_icon() {
     local APP_PATH="/Applications/ChatGPT.app"
     local ICON_PATH="$SCRIPT_DIR/../custom-icons-app/dark-chat-gpt.icns"
-    local INFO_PLIST="$APP_PATH/Contents/Info.plist"
     local PNG_ICON_PATH="/tmp/dark-chat-gpt.png"
     local BUNDLE_ICON_PATHS=(
         "$APP_PATH/Contents/Resources/electron.icns"
@@ -112,11 +111,8 @@ apply_chatgpt_icon() {
             echo "$(date): FAIL — ChatGPT bundle icon $BUNDLE_ICON_PATH" >> "$LOG"
     done
 
-    if [[ -f "$INFO_PLIST" ]]; then
-        /usr/libexec/PlistBuddy -c "Set :CFBundleIconFile electron.icns" "$INFO_PLIST" 2>/dev/null || true
-        /usr/libexec/PlistBuddy -c "Delete :CFBundleIconName" "$INFO_PLIST" 2>/dev/null || true
-        echo "$(date): OK — configured ChatGPT to use CFBundleIconFile" >> "$LOG"
-    fi
+    # NOTE: never rewrite Contents/Info.plist here. Its hash is part of the code
+    # signature, and AMFI then refuses to spawn the process ("Launch failed").
 
     if sips -s format png "$ICON_PATH" --out "$PNG_ICON_PATH" >/dev/null 2>&1; then
         for PNG_TARGET_PATH in "${PNG_ICON_PATHS[@]}"; do
@@ -134,7 +130,6 @@ apply_chatgpt_icon() {
 apply_warp_icon() {
     local APP_PATH="/Applications/Warp.app"
     local ICON_PATH="$SCRIPT_DIR/../custom-icons-app/warp-2.icns"
-    local INFO_PLIST="$APP_PATH/Contents/Info.plist"
     local BUNDLE_ICON_PATH="$APP_PATH/Contents/Resources/AppIcon.icns"
     # Warp ships an NSDockTilePlugIn that repaints the Dock icon from its own PNGs,
     # so the bundle icon alone is ignored while the app runs.
@@ -156,11 +151,9 @@ apply_warp_icon() {
         return 1
     fi
 
-    # Assets.car carries an AppIcon entry that wins over CFBundleIconFile.
-    if [[ -f "$INFO_PLIST" ]]; then
-        /usr/libexec/PlistBuddy -c "Delete :CFBundleIconName" "$INFO_PLIST" 2>/dev/null || true
-        echo "$(date): OK — configured Warp to use CFBundleIconFile" >> "$LOG"
-    fi
+    # NOTE: never rewrite Contents/Info.plist here. Its hash is part of the code
+    # signature, and AMFI refuses to spawn the process afterwards ("Launch failed").
+    # Finder still shows the fileicon custom icon while CFBundleIconName stays intact.
 
     if [[ ! -d "$DOCK_TILE_RESOURCES" ]]; then
         echo "$(date): SKIP — Warp dock tile plugin not found: $DOCK_TILE_RESOURCES" >> "$LOG"
