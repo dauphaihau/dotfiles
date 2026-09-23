@@ -1,0 +1,5 @@
+# Stow ignore list for the omp package.
+# config.yml.lock is live runtime state created and flocked by OMP, never a
+# managed dotfile; linking it would abort the whole package when the file
+# already exists.
+config\.yml\.lock
