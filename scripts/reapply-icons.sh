@@ -214,14 +214,15 @@ run_icon() {
         safari)   apply_icon "/Applications/Safari Technology Preview.app"  "$SCRIPT_DIR/../custom-icons-app/safari.icns" ;;
         webstorm)   apply_icon "/Applications/Webstorm.app"                 "$SCRIPT_DIR/../custom-icons-app/webstorm.icns" ;;
         cursor)   apply_icon "/Applications/Cursor.app"                   "$SCRIPT_DIR/../custom-icons-app/cursor.icns" ;;
+        notion)   apply_icon "/Applications/Notion.app"                   "$SCRIPT_DIR/../custom-icons-app/photoscape.icns" ;;
         steam)   apply_icon "/Applications/Steam.app"                   "$SCRIPT_DIR/../custom-icons-app/steam.icns" ;;
         orca)    apply_orca_icon ;;
         warp)    apply_warp_icon ;;
-        *)        echo "Unknown app: $1. Available: zalo whatsapp firefox wallper sigmaos chatgpt zed safari webstorm cursor steam orca warp" ;;
+        *)        echo "Unknown app: $1. Available: zalo whatsapp firefox wallper sigmaos chatgpt zed safari webstorm cursor notion steam orca warp" ;;
     esac
 }
 
-ALL_KEYS="zalo whatsapp firefox wallper sigmaos chatgpt zed safari webstorm cursor steam orca warp"
+ALL_KEYS="zalo whatsapp firefox wallper sigmaos chatgpt zed safari webstorm cursor notion steam orca warp"
 
 if [[ $# -eq 0 ]]; then
     for key in $ALL_KEYS; do
