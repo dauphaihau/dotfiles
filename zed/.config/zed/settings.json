@@ -67,7 +67,7 @@
     },
   },
   "agent_buffer_font_size": 11.0,
-  "diff_view_style": "split",
+  "diff_view_style": "unified",
   "zoomed_padding": true,
   "tab_bar": {
     "show_tab_bar_buttons": true,
