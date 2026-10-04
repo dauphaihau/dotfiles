@@ -58,7 +58,7 @@ retry:
       - openai-codex/gpt-5.6-sol:low
     opencode-go/deepseek-v4.1-flash:
       - openai-codex/gpt-5.6-sol:medium
-  usageAwareFallback: false
+  usageAwareFallback: true
   modelFallback: false
 display:
   showTokenUsage: true
