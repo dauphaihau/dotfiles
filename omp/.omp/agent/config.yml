@@ -1,8 +1,8 @@
 modelRoles:
   default: opencode-go/deepseek-v4.1-flash:off
   advisor: openai-codex/gpt-6-astra:off
-  slow: openai-codex/gpt-6.1-sol:low
-  smol: opencode-go/deepseek-v4.1-flash:low
+  slow: opencode-go/deepseek-v4.1-flash:low
+  smol: opencode-go/deepseek-v4.1-flash:off
   task: opencode-go/deepseek-v4.1-flash:off
   architect: openai-codex/gpt-6.1-sol:low
   architecture-2: openai-codex/gpt-6-astra:low
@@ -55,7 +55,7 @@ retry:
       - openai-codex/gpt-6-luna:off
     opencode-go/deepseek-v4.1-flash:
       - openai-codex/gpt-6-luna:off
-  usageAwareFallback: false
+  usageAwareFallback: true
   modelFallback: true
 display:
   showTokenUsage: true
