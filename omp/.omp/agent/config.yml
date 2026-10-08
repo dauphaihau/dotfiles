@@ -55,7 +55,7 @@ retry:
       - openai-codex/gpt-6-luna:off
     opencode-go/deepseek-v4.1-flash:
       - openai-codex/gpt-6-luna:off
-  usageAwareFallback: true
+  usageAwareFallback: false
   modelFallback: true
 display:
   showTokenUsage: true
