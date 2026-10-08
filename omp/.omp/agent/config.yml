@@ -1,20 +1,21 @@
 modelRoles:
-  default: opencode-go/deepseek-v4.1-flash:low
-  advisor: openai-codex/gpt-6-astra:high
-  slow: openai-codex/gpt-5.6-terra:medium
+  default: opencode-go/deepseek-v4.1-flash:off
+  advisor: openai-codex/gpt-6-astra:off
+  slow: openai-codex/gpt-6.1-sol:low
   smol: opencode-go/deepseek-v4.1-flash:low
-  task: opencode-go/kimi-k2.7-code:medium
-  architect: openai-codex/gpt-5.6-sol:medium
+  task: opencode-go/deepseek-v4.1-flash:off
+  architect: openai-codex/gpt-6.1-sol:low
   architecture-2: openai-codex/gpt-6-astra:low
-  architecture-3: opencode-go/glm-5.3-flash:high
-  architecture-4: opencode-go/deepseek-v4.1-flash:high
-  architecture-5: openai-codex/gpt-6-luna:low
+  architecture-3: opencode-go/glm-5.3-flash:low
+  architecture-4: opencode-go/deepseek-v4.1-flash:low
+  architecture-5: opencode-go/kimi-k2.7-code:low
 task:
   agentModelOverrides:
     task: "@task"
 symbolPreset: nerd
 composer:
   shape: borderless
+  tokenRate: false
 theme:
   dark: dark-cosmos
   light: light-github
@@ -50,16 +51,12 @@ statusLine:
 retry:
   waitForUsageReset: true
   fallbackChains:
-    openai-codex/gpt-5.5:
-      - google/gemini-3.6-flash
-      - openrouter/openrouter/free
-      - groq/openai/gpt-oss-120b
     opencode-go/kimi-k2.7-code:
-      - openai-codex/gpt-5.6-sol:low
+      - openai-codex/gpt-6-luna:off
     opencode-go/deepseek-v4.1-flash:
-      - openai-codex/gpt-5.6-sol:medium
+      - openai-codex/gpt-6-luna:off
   usageAwareFallback: true
-  modelFallback: false
+  modelFallback: true
 display:
   showTokenUsage: true
 cycleOrder:
