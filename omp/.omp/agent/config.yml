@@ -9,6 +9,7 @@ modelRoles:
   architecture-3: opencode-go/glm-5.3-flash:low
   architecture-4: opencode-go/deepseek-v4.1-flash:low
   architecture-5: opencode-go/kimi-k2.7-code:low
+  DEFAULT-2: opencode-go/deepseek-v4.1-flash:off
 task:
   agentModelOverrides:
     task: "@task"
