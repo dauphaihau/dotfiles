@@ -31,9 +31,9 @@ Use Orca orchestration when multiple substantial workstreams can proceed indepen
 
 Hierarchy:
 
-OMP native task → focused research/helper work
-Orca worker → substantial implementation
-Orca orchestration → multiple substantial workstreams
+* OMP native task → focused research/helper work
+* Orca worker → substantial implementation
+* Orca orchestration → multiple substantial workstreams
 
 # Shell Execution
 
@@ -43,8 +43,8 @@ Examples: `git status`, `git diff`, `git log`, `git show`, `ls`, `pwd`.
 
 Prefer:
 
-`git -C apps/web status --short`
-`git status --short`
+* `git -C apps/web status --short`
+* `git status --short`
 
 over:
 
