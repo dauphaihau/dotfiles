@@ -12,7 +12,11 @@
     "model_parameters": []
   }, */
   "git": {
+    "diff_base": "head",
+    "hunk_style": "staged_hollow",
     "inline_blame": {
+      "min_column": 0,
+      "location": "inline",
       "show_commit_summary": false
     }
   },
