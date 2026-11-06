@@ -1,0 +1,106 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="640" height="400" viewBox="0 0 640 400" font-family="system-ui,sans-serif">
+  <rect width="640" height="400" rx="12" fill="#141418"/>
+
+  <!-- Sidebar -->
+  <rect width="168" height="400" fill="#17171b"/>
+  <path d="M168 0v400" stroke="#2c2c32"/>
+  <g fill="#3b3b40"><circle cx="20" cy="18" r="4.5"/><circle cx="34" cy="18" r="4.5"/><circle cx="48" cy="18" r="4.5"/></g>
+  <text x="68" y="22" font-size="11" font-weight="600" fill="#dcdce2">Herdr</text>
+  <g fill="none" stroke="#83838f" stroke-width="1.4"><circle cx="139" cy="18" r="4.5"/><path d="M143 22l3.5 3.5"/><rect x="150" y="13" width="10" height="10" rx="2"/></g>
+  <path d="M0 34h168" stroke="#2c2c32"/>
+
+  <!-- Spaces -->
+  <text x="14" y="52" font-size="9.5" fill="#8a8a95">Spaces</text>
+  <g>
+    <rect x="10" y="58" width="148" height="17" rx="4" fill="#26262c"/>
+    <rect x="14" y="62" width="9" height="9" rx="2" fill="#5b8def"/>
+    <rect x="28" y="64" width="52" height="5" rx="2.5" fill="#c9c9d2"/>
+    <rect x="112" y="64" width="42" height="5" rx="2.5" fill="#4a4a52"/>
+    <rect x="14" y="83" width="9" height="9" rx="2" fill="#e3814f"/>
+    <rect x="28" y="85" width="40" height="5" rx="2.5" fill="#a5a5b0"/>
+    <rect x="122" y="85" width="32" height="5" rx="2.5" fill="#4a4a52"/>
+    <rect x="14" y="104" width="9" height="9" rx="2" fill="#22a99a"/>
+    <rect x="28" y="106" width="58" height="5" rx="2.5" fill="#a5a5b0"/>
+    <rect x="112" y="106" width="42" height="5" rx="2.5" fill="#4a4a52"/>
+    <rect x="10" y="121" width="148" height="17" rx="4" fill="#26262c"/>
+    <rect x="14" y="125" width="9" height="9" rx="2" fill="#8b7cf6"/>
+    <rect x="28" y="127" width="36" height="5" rx="2.5" fill="#c9c9d2"/>
+  </g>
+
+  <!-- Agents -->
+  <path d="M0 148h168" stroke="#2c2c32"/>
+  <text x="14" y="166" font-size="9.5" fill="#8a8a95">Agents</text>
+  <g>
+    <circle cx="19" cy="181" r="4" fill="none" stroke="#83838f" stroke-width="1.4"/>
+    <rect x="28" y="178" width="66" height="5" rx="2.5" fill="#b9b9c4"/>
+    <circle cx="146" cy="181" r="3" fill="#fbbf24"/>
+    <circle cx="19" cy="203" r="4" fill="none" stroke="#83838f" stroke-width="1.4"/>
+    <rect x="28" y="200" width="48" height="5" rx="2.5" fill="#a5a5b0"/>
+    <circle cx="146" cy="203" r="3" fill="#34d399"/>
+    <circle cx="19" cy="225" r="4" fill="none" stroke="#4a4a52" stroke-width="1.4"/>
+    <rect x="28" y="222" width="58" height="5" rx="2.5" fill="#8a8a95"/>
+    <circle cx="146" cy="225" r="3" fill="none" stroke="#83838f" stroke-width="1.2"/>
+  </g>
+
+  <!-- Sidebar footer -->
+  <path d="M0 331h168" stroke="#2c2c32"/>
+  <g>
+    <circle cx="21" cy="347" r="3.5" fill="none" stroke="#83838f" stroke-width="1.2"/>
+    <rect x="30" y="344" width="34" height="5" rx="2.5" fill="#8a8a95"/>
+    <path d="M21 362v6M18 365h6" stroke="#83838f" stroke-width="1.2"/>
+    <rect x="30" y="362" width="48" height="5" rx="2.5" fill="#8a8a95"/>
+    <circle cx="22" cy="383" r="7" fill="#2c2c32"/>
+    <text x="19" y="386" font-size="8" font-weight="700" fill="#dcdce2">D</text>
+    <rect x="35" y="379" width="44" height="5" rx="2.5" fill="#b9b9c4"/>
+    <rect x="35" y="387" width="30" height="4" rx="2" fill="#6a6a75"/>
+  </g>
+
+  <!-- Tab bar: rounded pills -->
+  <g>
+    <rect x="178" y="7" width="78" height="17" rx="7" fill="#26262c" stroke="#33333b"/>
+    <rect x="184" y="11" width="9" height="9" rx="2" fill="#c9c9d2"/>
+    <rect x="198" y="13" width="42" height="5" rx="2.5" fill="#e4e4ea"/>
+    <rect x="262" y="7" width="64" height="17" rx="7" fill="#141418"/>
+    <rect x="268" y="11" width="9" height="9" rx="2" fill="#4a4a52"/>
+    <rect x="282" y="13" width="30" height="5" rx="2.5" fill="#8a8a95"/>
+  </g>
+  <path d="M168 30h472" stroke="#2c2c32"/>
+
+  <!-- Panes: flush to the tab bar, the edges and each other, square corners -->
+  <g>
+    <rect x="168" y="30" width="236" height="304" fill="#18181c" stroke="#2c2c32"/>
+    <path d="M168 60h236" stroke="#2c2c32"/>
+    <rect x="178" y="39" width="9" height="9" rx="2" fill="#22a99a"/>
+    <rect x="191" y="41" width="70" height="5" rx="2.5" fill="#c9c9d2"/>
+    <rect x="330" y="41" width="60" height="5" rx="2.5" fill="#4a4a52"/>
+    <g fill="#3a3a42">
+      <rect x="180" y="78" width="172" height="6" rx="3"/><rect x="180" y="94" width="150" height="6" rx="3"/>
+      <rect x="180" y="110" width="182" height="6" rx="3"/><rect x="180" y="126" width="120" height="6" rx="3"/>
+      <rect x="180" y="142" width="164" height="6" rx="3"/><rect x="180" y="158" width="96" height="6" rx="3"/>
+      <rect x="180" y="174" width="176" height="6" rx="3"/><rect x="180" y="190" width="138" height="6" rx="3"/>
+    </g>
+    <rect x="180" y="300" width="6" height="12" rx="2" fill="#6b93ff"/>
+
+    <rect x="404" y="30" width="236" height="304" fill="#18181c" stroke="#2c2c32"/>
+    <path d="M404 60h236" stroke="#2c2c32"/>
+    <rect x="414" y="39" width="9" height="9" rx="2" fill="#8b7cf6"/>
+    <rect x="427" y="41" width="62" height="5" rx="2.5" fill="#c9c9d2"/>
+    <rect x="566" y="41" width="60" height="5" rx="2.5" fill="#4a4a52"/>
+    <g fill="#3a3a42">
+      <rect x="416" y="78" width="168" height="6" rx="3"/><rect x="416" y="94" width="192" height="6" rx="3"/>
+      <rect x="416" y="110" width="110" height="6" rx="3"/><rect x="416" y="126" width="176" height="6" rx="3"/>
+      <rect x="416" y="142" width="148" height="6" rx="3"/><rect x="416" y="158" width="186" height="6" rx="3"/>
+      <rect x="416" y="174" width="92" height="6" rx="3"/><rect x="416" y="190" width="160" height="6" rx="3"/>
+    </g>
+    <rect x="416" y="300" width="6" height="12" rx="2" fill="#6b93ff"/>
+  </g>
+
+  <!-- Status bar -->
+  <path d="M168 334h472" stroke="#2c2c32"/>
+  <g fill="#6a6a75">
+    <circle cx="182" cy="350" r="3"/><rect x="190" y="347" width="46" height="5" rx="2.5"/>
+    <rect x="252" y="347" width="60" height="5" rx="2.5"/>
+    <circle cx="332" cy="350" r="3"/><rect x="340" y="347" width="40" height="5" rx="2.5"/>
+    <rect x="588" y="347" width="52" height="5" rx="2.5"/>
+  </g>
+</svg>

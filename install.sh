@@ -204,6 +204,22 @@ for pkg in "${PACKAGES[@]}"; do
   echo "  stowed $pkg"
 done
 
+# Herdr writes runtime files (view.json, layouts/.state, mod reload files) next to
+# its config, so its package must not fold directories into the repo.
+stow --no-folding --target="$HOME" --dir="$DOTFILES_DIR" herdr
+echo "  stowed herdr"
+
+# Herdr loads a mod from inside its app dir and refuses imports that resolve out
+# of it, so per-file symlinks break multi-file mods. Link each mod folder whole
+# instead: imports stay inside, and saving in the repo hot-reloads the mod.
+mkdir -p "$HOME/.config/herdr-app/mods"
+for dir in "$DOTFILES_DIR"/herdr/.config/herdr-app/mods/*/; do
+  name="$(basename "$dir")"
+  rm -rf "$HOME/.config/herdr-app/mods/$name"
+  ln -s "$dir" "$HOME/.config/herdr-app/mods/$name"
+  echo "  linked mod $name"
+done
+
 # ── Backup job (launchd) ──────────────────────────────────────────────────────
 PLIST_SRC="$DOTFILES_DIR/scripts/com.dauphaihau.dotfiles-backup.plist"
 PLIST_DST="$HOME/Library/LaunchAgents/com.dauphaihau.dotfiles-backup.plist"

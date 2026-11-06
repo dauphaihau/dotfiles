@@ -1,0 +1,202 @@
+{
+  "id": "root",
+  "preview": "layouts/0oz-design.png",
+  "type": "row",
+  "children": [
+    {
+      "id": "sidebar",
+      "type": "column",
+      "children": [
+        {
+          "id": "brand",
+          "type": "block",
+          "content": {
+            "mod": "oz-chrome"
+          },
+          "size": {
+            "px": 48
+          },
+          "window_drag": true
+        },
+        {
+          "id": "sidebar-lists",
+          "type": "column",
+          "children": [
+            {
+              "id": "spaces",
+              "type": "block",
+              "content": {
+                "mod": "oz-spaces"
+              },
+              "size": {
+                "weight": 1
+              },
+              "min": 90
+            },
+            {
+              "id": "agents",
+              "type": "block",
+              "content": {
+                "mod": "agents"
+              },
+              "size": {
+                "weight": 1
+              },
+              "min": 90
+            }
+          ]
+        },
+        {
+          "id": "sidebar-footer",
+          "type": "block",
+          "content": {
+            "mod": "oz-chrome",
+            "props": {
+              "footer": true
+            }
+          },
+          "size": {
+            "px": 132
+          }
+        }
+      ],
+      "size": {
+        "px": 256
+      },
+      "min": 44,
+      "max": 480,
+      "background": "chrome",
+      "resizable": false
+    },
+    {
+      "id": "work",
+      "type": "column",
+      "padding": 6,
+      "gap": 4,
+      "children": [
+        {
+          "id": "inset",
+          "type": "column",
+          "background": "background",
+          "radius": 12,
+          "border": {
+            "width": 1,
+            "color": "border"
+          },
+          "shadow": "sm",
+          "resizable": false,
+          "children": [
+            {
+              "id": "tabs",
+              "type": "block",
+              "content": {
+                "mod": "oz-tabs"
+              },
+              "size": {
+                "px": 48
+              },
+              "window_drag": true
+            },
+            {
+              "id": "work-body",
+              "type": "row",
+              "children": [
+                {
+                  "id": "main",
+                  "type": "block",
+                  "content": {
+                    "tab": "active",
+                    "pane": {
+                      "header": {
+                        "content": {
+                          "mod": "oz-pane"
+                        },
+                        "reveal": "always",
+                        "height": 38,
+                        "position": "top"
+                      },
+                      "background": "background",
+                      "border": {
+                        "width": 0,
+                        "color": "border"
+                      },
+                      "focus": {
+                        "width": 0,
+                        "color": "border"
+                      },
+                      "radius": 0,
+                      "gap": 1,
+                      "lone": false
+                    }
+                  },
+                  "background": "border"
+                },
+                {
+                  "id": "panel",
+                  "type": "column",
+                  "children": [
+                    {
+                      "id": "panel-body",
+                      "type": "stack",
+                      "children": [
+                        {
+                          "id": "files",
+                          "type": "block",
+                          "content": {
+                            "mod": "oz-files"
+                          }
+                        },
+                        {
+                          "id": "changes",
+                          "type": "block",
+                          "content": {
+                            "mod": "oz-changes"
+                          }
+                        }
+                      ],
+                      "active": "files"
+                    }
+                  ],
+                  "size": {
+                    "px": 368
+                  },
+                  "min": 280,
+                  "max": 900,
+                  "hidden": true
+                }
+              ],
+              "padding": 0,
+              "gap": 1,
+              "background": "border"
+            }
+          ]
+        },
+        {
+          "id": "status",
+          "type": "block",
+          "content": {
+            "mod": "oz-status"
+          },
+          "size": {
+            "px": 26
+          }
+        }
+      ],
+      "resizable": false
+    }
+  ],
+  "background": "chrome",
+  "theme": {
+    "light": "paper",
+    "dark": "0oz"
+  },
+  "terminal_padding": [
+    10,
+    8
+  ],
+  "titlebar": "none",
+  "traffic_lights": [
+    12,
+    16
+  ]
+}

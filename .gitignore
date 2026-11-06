@@ -1,0 +1,4 @@
+# Herdr writes these into each mod folder (now symlinked to the repo)
+herdr/.config/herdr-app/mods/**/gpui-kit.d.ts
+herdr/.config/herdr-app/mods/**/jsconfig.json
+herdr/.config/herdr-app/mods/**/*.error

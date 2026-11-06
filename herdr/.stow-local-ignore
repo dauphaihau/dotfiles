@@ -1,0 +1,7 @@
+gpui-kit\.d\.ts
+herdr\.d\.ts
+jsconfig\.json
+.*\.error
+\.state
+^mods$
+^mods/
