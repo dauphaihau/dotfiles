@@ -20,7 +20,7 @@ composer:
 theme:
   dark: dark-cosmos
   light: light-github
-setupVersion: 2
+setupVersion: 3
 colorBlindMode: false
 images:
   blockImages: false
@@ -60,5 +60,6 @@ retry:
   modelFallback: true
 display:
   showTokenUsage: true
-cycleOrder:
-  []
+cycleOrder: []
+update:
+  auto: false
