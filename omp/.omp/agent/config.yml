@@ -63,3 +63,5 @@ display:
 cycleOrder: []
 update:
   auto: false
+tui:
+  vimMode: true
