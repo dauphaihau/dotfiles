@@ -1,6 +1,6 @@
 # Docker runtime management (runtime-agnostic) — dr = docker runtime
 if command -v colima &>/dev/null; then
-  alias drs='colima start'   # docker runtime start
+  drs() { colima status >/dev/null 2>&1 || colima start; } # docker runtime start (idempotent)
   alias drsp='colima stop'   # docker runtime stop
   alias drst='colima status' # docker runtime status
   alias drr='colima restart' # docker runtime restart                                              
