@@ -43,7 +43,8 @@ dev:
   autoqaConsent: granted
 extendedContext: false
 codexResets:
-  autoRedeem: "no"
+  autoRedeem5h: "no"
+  autoRedeemWeekly: "no"
 advisor:
   enabled: false
 statusLine:
