@@ -129,6 +129,42 @@ apply_warp_icon() {
     touch "$APP_PATH"
 }
 
+apply_hermes_icon() {
+    local ICON_PATH="$SCRIPT_DIR/../custom-icons-app/grok-bot.icns"
+    local APP_PATHS=(
+        "/Applications/Hermes.app"
+        "$HOME/.hermes/hermes-agent/apps/desktop/release/mac-arm64/Hermes.app"
+    )
+    local APP_PATH
+    local BUNDLE_ICON_PATH
+
+    if [[ ! -f "$ICON_PATH" ]]; then
+        echo "$(date): SKIP — icon $ICON_PATH not found" >> "$LOG"
+        return
+    fi
+
+    for APP_PATH in "${APP_PATHS[@]}"; do
+        if [[ ! -d "$APP_PATH" ]]; then
+            echo "$(date): SKIP — $APP_PATH not found" >> "$LOG"
+            continue
+        fi
+
+        apply_icon "$APP_PATH" "$ICON_PATH"
+
+        # A plain Finder custom icon is ignored once the app starts: the Dock
+        # paints CFBundleIconFile from the bundle. Overwrite that resource too.
+        BUNDLE_ICON_PATH="$APP_PATH/Contents/Resources/icon.icns"
+        cp "$ICON_PATH" "$BUNDLE_ICON_PATH" && \
+            echo "$(date): OK — updated Hermes bundle icon $BUNDLE_ICON_PATH" >> "$LOG" || \
+            echo "$(date): FAIL — Hermes bundle icon $BUNDLE_ICON_PATH" >> "$LOG"
+
+        # NOTE: never rewrite Contents/Info.plist here. Its hash is part of the
+        # code signature, and AMFI refuses to spawn the process ("Launch failed").
+
+        touch "$APP_PATH"
+    done
+}
+
 refresh_icon_caches() {
     local USER_CACHE_DIR
 
@@ -159,15 +195,16 @@ run_icon() {
         safari)   apply_icon "/Applications/Safari Technology Preview.app"  "$SCRIPT_DIR/../custom-icons-app/safari.icns" ;;
         webstorm)   apply_icon "/Applications/Webstorm.app"                 "$SCRIPT_DIR/../custom-icons-app/webstorm.icns" ;;
         cursor)   apply_icon "/Applications/Cursor.app"                   "$SCRIPT_DIR/../custom-icons-app/cursor.icns" ;;
-        notion)   apply_icon "/Applications/Notion.app"                   "$SCRIPT_DIR/../custom-icons-app/grok-bot.icns" ;;
+        notion)   apply_icon "/Applications/Notion.app"                   "$SCRIPT_DIR/../custom-icons-app/cross-over.icns" ;;
+        hermes)   apply_hermes_icon ;;
         steam)   apply_icon "/Applications/Steam.app"                   "$SCRIPT_DIR/../custom-icons-app/steam.icns" ;;
         tern)    apply_icon "/Applications/Tern.app"                      "$SCRIPT_DIR/../custom-icons-app/telegram-dark.icns" ;;
         warp)    apply_warp_icon ;;
-        *)        echo "Unknown app: $1. Available: zalo whatsapp firefox wallper sigmaos chatgpt zed safari webstorm cursor notion steam tern warp" ;;
+        *)        echo "Unknown app: $1. Available: zalo whatsapp firefox wallper sigmaos chatgpt zed safari webstorm cursor notion hermes steam tern warp" ;;
     esac
 }
 
-ALL_KEYS="zalo whatsapp firefox wallper sigmaos chatgpt zed safari webstorm cursor notion steam tern warp"
+ALL_KEYS="zalo whatsapp firefox wallper sigmaos chatgpt zed safari webstorm cursor notion hermes steam tern warp"
 
 if [[ $# -eq 0 ]]; then
     for key in $ALL_KEYS; do
