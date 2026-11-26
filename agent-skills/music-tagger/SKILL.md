@@ -117,10 +117,21 @@ Everything that can be attached is resolved **before** you stop, so the user rev
 Run this for every proposal. Skip it only when the user asked for tags only (`--no-lyrics`, "no lyrics", "just tags").
 
 ```bash
-zsh <skill-dir>/scripts/lyrics.sh "<folder>/mtag-proposal.md"   # add --force to refetch staged files
+zsh <skill-dir>/scripts/lyrics.sh "<folder>/mtag-proposal.md"   # --force refetches staged files, --arrangement adds the lofi/extended pass
 ```
 
-It queries LRCLIB per `OK` row (artist + title), keeps candidates within 3s of the file's own duration, prefers a normalized exact title match, writes the plain lyrics to `<folder>/.mtag-lyrics/<artist>-<title>.txt`, and prints one line per row. An `origin` marker is stripped before the query — `Laura Benanti (Lewis Capaldi origin)` is looked up as `Laura Benanti`, and the staged filename uses the bare name.
+It queries LRCLIB per `OK` row, keeps candidates within 3s of the file's own duration, prefers a normalized exact title match, writes the plain lyrics to `<folder>/.mtag-lyrics/<artist>-<title>.txt`, and prints one line per row. An `origin` marker is stripped before the query — `Laura Benanti (Lewis Capaldi origin)` is looked up as `Laura Benanti`, and the staged filename uses the bare name.
+
+**Credit split.** LRCLIB's artist field holds one artist, never a collaboration credit, so `T.R.I x Dangrangto x DONAL` finds nothing as written. After the credit query misses, the script retries with a title-only query and then with each collaborator (`T.R.I`, `Dangrangto`, `DONAL`) as the artist. A title-only search is capped at 20 hits, so a common title (`Mưa` returns twenty "Mua Mua Mua" records) buries the right entry — the collaborator query is what finds it. Trailing qualifiers are dropped for the lookup: `Đường Tôi Chở Em Về (Lofi Ver.)` is searched as `Đường Tôi Chở Em Về`. Such a hit is labelled `(artist credit split)` or `(artist credit split, queried <name>)`.
+
+**Arrangement pass (`--arrangement`).** Lofi, extended and remastered cuts sit seconds outside the 3s gate, so with the flag a candidate outside it is still considered, bounded at 120s and requiring an exact title plus a matching artist:
+
+- `(arrangement override, 4.88s, 6 lrclib records)` — the closest exact-title record is within 15s and at least two LRCLIB records agree on title+artist.
+- `(arrangement override, lyrics.ovh agrees 0.96)` — the two rules above did not settle it, so the text is compared against `api.lyrics.ovh` (token overlap of word sets). At ≥0.8 the row matches; below it the row is `ambiguous` and names the score, and you stage text by hand only if the version really is right.
+
+`api.lyrics.ovh` is a **corroborator, never a text source**: it only decides whether the LRCLIB record belongs to this file, and the staged text is always LRCLIB's `plainLyrics`. It also answers with wrong songs for thin lookups — `M4U / Mưa` returned a different M4U song — which is why a bare title match is never trusted.
+
+Artist comparison folds diacritics (`Thùy` / `Thuỳ` / `Thuy` compare equal, `đ` → `d`) and also compares a diacritic-stripped form, so a Vietnamese spelling on one side and an ASCII spelling on the other still line up. `perl` does the folding; without it the script falls back to iconv and then to plain stripping, which is weaker on Vietnamese.
 
 **Origin fallback.** When the performer's own lookup finds no match and the `ARTIST` cell carries an `origin`, the query is retried against the original artist — usually the only version LRCLIB has. The retry demands a normalized exact title plus a matching artist, applies **no duration gate** (a cover's length often differs a lot) and takes the closest duration; the detail line says `(via original <name>)`, e.g.
 
@@ -134,13 +145,13 @@ If the closest exact-title candidate is more than 120s off the file, the fallbac
 LYRICS <TAB> FILE <TAB> PATH|- <TAB> STATUS <TAB> DETAIL
 ```
 
-- `match` — patch that row's `LYRICS` cell with `PATH` (as printed, relative to the folder).
+- `match` — patch that row's `LYRICS` cell with `PATH` (as printed, relative to the folder). Read the label in DETAIL: `(artist credit split …)`, `(via original …)` and `(arrangement override …)` all mean the record was reached by a widened lookup, not by an exact artist+duration hit.
 - `cached` — a usable file is already staged; patch the cell with `PATH`.
 - `ambiguous` — candidates matched but the title was not exact. Leave `-` and tell the user what was found; never guess a lyric source.
 - `none` — leave `-`. This is normal for covers, live takes, and non-mainstream catalogs.
 - `error` — network or IO failure for that row; leave `-`, report it, and continue. Do not abort the whole run.
 
-Patch only the `LYRICS` cells — the column is 5th. Do not reorder, rewrap, or re-align other cells, and never paste lyric text into the table. Repeat the `MATCH`/`cached` paths and the notable `DETAIL` lines when you report at the stop, so the user can catch a wrong match — especially a `(via original …)` one — before anything is written.
+Patch only the `LYRICS` cells — the column is 5th. Do not reorder, rewrap, or re-align other cells, and never paste lyric text into the table. Repeat the `MATCH`/`cached` paths and the notable `DETAIL` lines when you report at the stop, so the user can catch a wrong match — especially a `(via original …)`, `(artist credit split …)` or `(arrangement override …)` one; for an override, quote the duration diff and the evidence label — before anything is written.
 
 ### 4b. Covers — from images you actually have
 
@@ -176,7 +187,7 @@ Other rules:
 
 ## Phase 5 — Stop for review
 
-Print the proposal path, the per-status counts, the list of `OK` rows with their resulting filenames, the lyrics outcome per row (`match`/`none`/`ambiguous`, including any `via original`), and the image mapping. Then stop and wait. Never run `mtag` or `apply.sh --yes` before the user accepts.
+Print the proposal path, the per-status counts, the list of `OK` rows with their resulting filenames, the lyrics outcome per row (`match`/`none`/`ambiguous`) with every widened-lookup label (`via original`, `artist credit split`, `arrangement override` plus its duration diff and evidence), and the image mapping. Then stop and wait. Never run `mtag` or `apply.sh --yes` before the user accepts.
 
 This is the single gate: lyrics and covers are already in the table by now, so nothing else is fetched after acceptance. The user accepts by editing the table in place and saying go. Re-read the file after acceptance; do not reuse values you had in memory.
 
@@ -221,10 +232,14 @@ Do not claim success for a row that reported `ERROR`, and never describe lyrics 
 - **Embedded art adds weight.** A 5MB JPEG is copied into every track it is attached to. Prefer ≤1000px and <1MB, and mention the size in `NOTE` when it is far over.
 - **The origin fallback can attach the original's text to a re-written cover.** Lyrics are normally identical across versions, but a cover with altered verses or added ad-libs will get the original's words. The `(via original …)` label plus the duration diff in DETAIL is the tell — read those lines before accepting, and blank the cell if a row looks wrong.
 - **Lyrics coverage is partial.** LRCLIB had 20 results for `Enrique Iglesias / Why Not Me` but **zero** for `Laura Benanti / Someone You Loved`, and a duration filter rejected a 30s clip of a 4-minute track. Covers, live versions, remixes, and non-mainstream catalogs routinely miss. `none` is a normal outcome, not a failure — say so and move on. The origin fallback rescues part of that gap, not all of it: it needs an `origin` marker to work from.
-- **Never fabricate lyrics.** No writing lyric text from memory, no picking the first search hit, no matching on title alone. A `match` requires a normalized exact title and either a duration within 3s of the file (performer lookup) or an exact artist plus the 120s guard (origin fallback).
+- **Never fabricate lyrics.** No writing lyric text from memory, no picking the first search hit, no matching on title alone. A `match` requires a normalized exact title and one of: a duration within 3s of the file, an `origin` marker with a matching artist and the 120s guard, a collaboration credit whose collaborator matches the LRCLIB artist, or — only under `--arrangement` — a 15s/2-record bound or ≥0.8 text agreement with lyrics.ovh.
+- **Credit splitting is a lookup widening, not a loosening.** The artist comparison still runs per candidate against every collaborator key, and the 3s gate still applies. It only changes which queries are sent, because LRCLIB's artist field cannot hold `A x B` verbatim. Cost: a row that misses sends a title-only search (capped at 20 hits by the API) and then up to one query per collaborator, so a seven-track folder with no lyrics can mean a few dozen requests.
+- **The arrangement override is opt-in and prints its receipts.** Without `--arrangement` a 4s-off lofi cut stays `ambiguous`; with it, the row is only accepted when two LRCLIB records agree on title+artist within 15s, or when lyrics.ovh's text agrees ≥0.8 with the LRCLIB record. Both labels carry the diff, so a wrongly requested override is visible in the stop report. Lofi/extended cuts usually differ only in tempo — a version that re-records verses can still get the studio text, which is what the corroboration score is for.
+- **`api.lyrics.ovh` is a corroborator, never a text source.** Its response only confirms which LRCLIB record belongs to the file — the staged text is always LRCLIB's `plainLyrics` — and it answers thin lookups with the wrong song (`M4U / Mưa` returned a different M4U track). Unreachable or 404 counts as no corroboration: the row reports `ambiguous`, never a match. At most 2×2 lookups are attempted per row so a dead source cannot stall a run.
+- **Diacritic folding needs `perl`.** It decomposes to NFD and drops combining marks, so `Thùy` / `Thuỳ` / `Thuy` compare equal and `đ` folds to `d`. Without perl the script falls back to iconv and then to plain stripping, which on Vietnamese drops vowels outright (`Trọng` → `trng`) and weakens matching. A stripped-form comparison can also equate two titles that differ only in diacritics; the exact-title-plus-duration rules still stand between that and a wrong embed.
 - **Synced lyrics are deliberately ignored.** LRCLIB returns LRC with timestamps, but USLT has no timing, so embedding LRC text would store literal `[00:12.34]` lines in the tag. Only `plainLyrics` is embedded.
 - **Lyrics staging is disposable.** `apply.sh` deletes `.mtag-lyrics/` files after a row embeds and verifies them, so an applied+renamed row cannot be re-applied without re-running `lyrics.sh` (one LRCLIB call, or `cached` if the file is still staged).
-- **Fetching is on by default and happens before the review.** Every run makes one LRCLIB request per `OK` row, so the lyrics outcome is part of what the user reviews at the stop, not a surprise afterwards. Skip the step only when they ask for tags only. A run with no network still tags everything — lyrics just come back as per-row `error`.
+- **Fetching is on by default and happens before the review.** Every run queries LRCLIB per `OK` row (1 request when the credit hits, a handful when it is split), so the lyrics outcome is part of what the user reviews at the stop, not a surprise afterwards. Skip the step only when they ask for tags only. A run with no network still tags everything — lyrics just come back as per-row `error`.
 - **Network failure is row-local.** A `curl`/timeout error on one row reports `error` for that row; the other rows still fetch and apply. Never treat a failed fetch as a match, and never abort tagging because lyrics failed.
 - **Idempotence.** Re-running an applied proposal is safe but noisy: rows whose file was renamed away report `missing file`, rows already carrying the target name are tagged in place without a second rename. Never present a re-run as a fresh success.
 - **No rolling back.** Renames are plain `mv`; there is no undo. Keep the proposal file until the user has checked the result — it is the only record of the old→new mapping.
